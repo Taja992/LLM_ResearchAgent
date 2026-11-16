@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(uvx ruff *)",
+      "Bash(.venv/Scripts/python -m pytest*)",
+      "Bash(uv pip list*)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)"
+    ],
+    "deny": [
+      "Read(./.env)"
+    ]
+  }
+}
