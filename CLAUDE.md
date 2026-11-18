@@ -44,11 +44,14 @@ uvx ruff check --fix .                 # lint + auto-fix
 Kept short: this file loads in every session.
 
 - **Exists:** `main.py` skeleton (a PydanticAI `Agent`, an empty `search_papers` tool, a `PaperAnswer` model with only `explanation`). It runs end to end on local Ollama (`qwen2.5:7b-instruct`); any model swaps in via `MODEL` in `.env`. `requirements.txt` (pydantic-ai-slim 2.68, httpx, python-dotenv, pytest). A `.venv` made by `uv` with Python 3.12.
-- **Not yet:** git repo, a free cloud LLM chosen for the README, a real paper search, filtering, evaluation, README.
-- **Next:** Phase 0, step 1 in [docs/PLAN.md](docs/PLAN.md).
+- **Git:** initialised, first commit made (code, `CLAUDE.md`, `.claude/`, `.vscode/`; not `docs/` or `.env`).
+- **Paper API chosen:** OpenAlex, optional `OPENALEX_API_KEY` (decision 6). Field mapping in `docs/NOTES.md`.
+- **`openalex.py`:** `Paper` model + `paper_from_openalex()` (one OpenAlex result → `Paper`). Tests in `tests/test_openalex.py` (5 pass, sample data only).
+- **Not yet:** a free cloud LLM chosen for the README, the HTTP search call, the tool hookup, filtering, evaluation, README.
+- **Next:** Phase 1 search function in [docs/PLAN.md](docs/PLAN.md). The "pick a free cloud LLM" box in Phase 0 is deliberately postponed. `main.py` fails `ruff format --check` (pre-existing; owner to decide).
 
 ## Working notes
 
-- **`docs/` is private** (git-ignored, this machine only). Anything graded (workflow write-up, eval set and results, reflection) goes in committed files like `README.md`, never only in `docs/`. Committed files must not link into `docs/`.
+- **`docs/` is private** (git-ignored, this machine only). Anything graded (workflow write-up, eval set and results, reflection) goes in committed files like `README.md`, never only in `docs/`. Graded files (README etc.) must not link into `docs/`; `CLAUDE.md` and `.claude/` are committed and may.
 - Windows 11. The `.venv` has no `pip`: use `uv pip ...`.
 - pytest exit code 5 means "no tests found". That's fine before tests exist.

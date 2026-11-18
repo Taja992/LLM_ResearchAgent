@@ -47,6 +47,8 @@ Link files as clickable paths. Keep it brief: a short list per file, not an essa
   - Keep it simple: short plain feature names ("Searches OpenAlex", "Filters by year"), **3 to 8 bullets each**, max 20 words a bullet, saying how it works. No lists of file names, no history, no tiny details.
   - A new feature gets a new heading and a line in the table of contents. If a feature would pass 8 bullets, merge or drop some.
   - **Fix or remove any bullet this step made untrue**, and don't repeat a point that's already there.
+  - **Link code names to their exact lines**, relative from `docs/`: `[`rebuild_abstract`](../openalex.py#L25-L33)`. Mark notes about code that doesn't exist yet "(no code yet)".
+  - **Re-check every existing link** whenever code changed (any file, including formatting): open the file with line numbers and fix links that now point at the wrong lines.
 
 ## 7. Stop
 Leave everything uncommitted (the owner reviews and commits). Suggest a commit message, and say what the next piece would be. Don't start it.
