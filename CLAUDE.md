@@ -48,7 +48,7 @@ uvx ruff check --fix .                 # lint + auto-fix
 
 Kept short: this file loads in every session.
 
-- **Exists:** the full agent runs end to end: `main.py` (command line) → `workflow.find_paper()` (five steps in order) → `PaperAnswer` or `NoMatch`. Local Ollama `qwen2.5:7b-instruct`; any model swaps in via `MODEL` in `.env`. `requirements.txt` (pydantic-ai-slim 2.68, httpx, python-dotenv, pytest). A `.venv` made by `uv` with Python 3.12.
+- **Exists:** the full agent runs end to end: `main.py` (command line) → `workflow.find_paper()` (five steps in order) → `PaperAnswer` or `NoMatch`. Local Ollama `qwen2.5:7b-instruct`; any model swaps in via `MODEL` in `.env`. `requirements.txt` (pydantic-ai-slim 2.68, pydantic-evals 2.68, httpx, python-dotenv, pytest). A `.venv` made by `uv` with Python 3.12.
 - **Git:** initialised, first commit made (code, `CLAUDE.md`, `.claude/`, `.vscode/`; not `docs/` or `.env`).
 - **Paper API chosen:** OpenAlex, optional `OPENALEX_API_KEY` (decision 6). Field mapping in `docs/NOTES.md`.
 - **`models.py`:** shared data models: `Paper`, `Constraints` (topic + optional year/citation `NumberRule`s + `recent` flag), `Verdict`, `AllowedRange`, `PaperAnswer` (`from_paper()` copies facts; LLM gives explanation + uncertainty). Tests in `tests/test_models.py`.
@@ -59,8 +59,10 @@ Kept short: this file loads in every session.
 - **Workflow designed (decisions 9–10):** code runs fixed steps (LLM reads request → code search → code filter → LLM judges relevance, with an optional `search_papers` tool → code builds answer). Described in `README.md` "How the agent works" (README has only that section so far).
 - **Model:** local Ollama `qwen2.5:7b-instruct` is final (decision 12); no cloud LLM planned.
 - **README:** "How the agent works" is final (workflow, code locations, checks, example). Setup/run/evaluation/reflection sections still to come.
-- **Not yet:** evaluation (Phase 4), rest of README (Phase 5).
-- **Next:** Phase 4 "Read up on agent evaluation" in [docs/PLAN.md](docs/PLAN.md). Phase 3 is complete. Ollama must be running for real tries (the app, or `ollama serve`).
+- **Evaluation method chosen (decision 31):** code checks the exact criteria, the owner scores relevance/usefulness with a 0–2 rubric. The research with sources is at the bottom of `docs/NOTES.md`, not in the README (owner's choice).
+- **`evaluation_cases.py`:** `EVALUATION_SET`, a `pydantic_evals` `Dataset` of 12 cases, each with hand-written `CaseCriteria` (decision 32). Tests in `tests/test_evaluation_cases.py`. 92 tests pass in total.
+- **Not yet:** automatic checks, running and results (Phase 4), rest of README (Phase 5).
+- **Next:** Phase 4 "Automatic checks" (`pydantic_evals` evaluators) in [docs/PLAN.md](docs/PLAN.md). Ollama must be running for real tries (the app, or `ollama serve`).
 
 ## Working notes
 
