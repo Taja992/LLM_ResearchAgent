@@ -51,3 +51,16 @@ class Constraints(BaseModel):
     recent: bool = Field(
         default=False, description="True if the user asked for a 'recent' paper."
     )
+
+
+class Verdict(BaseModel):
+    """The filter's decision on one paper: accepted, or rejected with reasons."""
+
+    paper: Paper
+    reasons: list[str] = Field(
+        default_factory=list, description="Why the paper fails; empty if it passes."
+    )
+
+    @property
+    def accepted(self) -> bool:
+        return not self.reasons
