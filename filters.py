@@ -4,7 +4,17 @@ Plain code, no LLM: comparing numbers must be exact. What each rule allows is
 defined in rules.py; this file only checks papers against it.
 """
 
-from models import Comparison, Constraints, Paper, ResolvedRule, Verdict
+from collections import Counter
+
+from models import (
+    Comparison,
+    Constraints,
+    Paper,
+    Rejection,
+    ResolvedRule,
+    RuleField,
+    Verdict,
+)
 from rules import citation_rules, year_rules
 
 
@@ -29,12 +39,27 @@ def check_paper(paper: Paper, constraints: Constraints, current_year: int) -> Ve
     return Verdict(paper=paper, reasons=reasons)
 
 
-def _check_number(label: str, actual: int | None, rule: ResolvedRule) -> str | None:
+def summarize_rejections(verdicts: list[Verdict]) -> list[str]:
+    """Count how many papers failed each rule, most common first."""
+    counts = Counter(
+        (reason.field, reason.needs)
+        for verdict in verdicts
+        for reason in verdict.reasons
+    )
+    return [
+        f"{count} paper{'' if count == 1 else 's'}: {field} needs {needs}"
+        for (field, needs), count in counts.most_common()
+    ]
+
+
+def _check_number(
+    label: RuleField, actual: int | None, rule: ResolvedRule
+) -> Rejection | None:
     """Return why `actual` fails `rule`, or None if it passes. A missing number fails."""
     if actual is not None and rule.allowed.contains(actual):
         return None
     shown = "unknown" if actual is None else str(actual)
-    return f"{label} is {shown}, needs {_describe(rule)}"
+    return Rejection(field=label, actual=shown, needs=_describe(rule))
 
 
 def _describe(rule: ResolvedRule) -> str:

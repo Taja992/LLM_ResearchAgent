@@ -4,7 +4,7 @@ Each model says what the data looks like; other files decide where it comes from
 """
 
 from enum import StrEnum
-from typing import Self
+from typing import Literal, Self
 
 from pydantic import BaseModel, Field
 
@@ -54,11 +54,25 @@ class Constraints(BaseModel):
     )
 
 
+RuleField = Literal["year", "citations"]  # the two numbers rules can check
+
+
+class Rejection(BaseModel):
+    """One rule a paper fails, e.g. year is 2017 but needs < 2015."""
+
+    field: RuleField
+    actual: str  # the paper's value, or "unknown"
+    needs: str  # the rule in words, e.g. "< 2015" or "about 1000 (800 to 1200)"
+
+    def __str__(self) -> str:
+        return f"{self.field} is {self.actual}, needs {self.needs}"
+
+
 class Verdict(BaseModel):
     """The filter's decision on one paper: accepted, or rejected with reasons."""
 
     paper: Paper
-    reasons: list[str] = Field(
+    reasons: list[Rejection] = Field(
         default_factory=list, description="Why the paper fails; empty if it passes."
     )
 
@@ -155,3 +169,15 @@ class RelevanceOutcome(BaseModel):
     explanation: str
     uncertainty: str | None
     extra_searches: int  # searches after the first: by the tool or the code fallback
+
+
+NO_MATCH_MESSAGE = "No matching paper found."
+
+
+class NoMatch(BaseModel):
+    """The answer when no paper fits: code's counts plus the LLM's explanation."""
+
+    message: str = NO_MATCH_MESSAGE
+    papers_checked: int  # how many papers the main search returned
+    rejections: list[str]  # e.g. "18 papers: year needs < 2015"
+    explanation: str  # the LLM's view of why the remaining papers didn't fit

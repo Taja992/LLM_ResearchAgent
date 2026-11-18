@@ -34,7 +34,7 @@ user request
 | 4. Judge relevance | LLM | Whether a paper is really *about* the topic is a judgement call on titles and abstracts. |
 | 5. Build the answer | Code | Facts are copied from the tool's data, so the LLM cannot invent a title, year or citation count. |
 
-**When nothing fits:** if no candidate survives the filter (even after the optional re-search), code returns a clear "no matching paper found" answer, listing why candidates were rejected, instead of forcing a pick.
+**When nothing fits:** if no candidate fits (even after the extra search), the agent answers "No matching paper found." instead of forcing a pick. Code adds how many papers were checked and how many failed each rule (e.g. "18 papers: year needs < 2015"); the LLM adds why the papers that passed the rules still weren't about the topic.
 
 **Uncertainty:** the LLM's explanation must mention doubts, for example when the topic is only partly matched or "about 1000 citations" is close but not exact.
 

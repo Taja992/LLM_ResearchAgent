@@ -6,7 +6,7 @@ from typing import Any
 from pydantic_ai.messages import ModelMessage, ModelResponse, TextPart
 from pydantic_ai.models.function import AgentInfo, FunctionModel
 
-from models import Constraints, Paper
+from models import Constraints, NoMatch, Paper, PaperAnswer
 from workflow import find_paper
 
 CURRENT_YEAR = 2026
@@ -54,14 +54,14 @@ def test_whole_workflow_returns_an_answer_built_from_the_paper() -> None:
         REQUEST, scripted_llm(replies, prompts), CURRENT_YEAR, fake_search
     )
 
-    assert answer is not None
+    assert isinstance(answer, PaperAnswer)
     assert answer.title == OLD_PAPER.title  # facts come from the paper...
     assert answer.citation_count == OLD_PAPER.citation_count
     assert answer.explanation == "It introduces RAG."  # ...words from the LLM
     assert "Late RAG" not in prompts[1]  # the filter removed it before step 4
 
 
-def test_nothing_fits_returns_none() -> None:
+def test_nothing_fits_explains_why_with_counts_and_the_llms_words() -> None:
     replies: list[dict[str, Any]] = [
         CONSTRAINTS_REPLY,
         {"paper_number": None, "explanation": "None fit."},
@@ -69,4 +69,7 @@ def test_nothing_fits_returns_none() -> None:
 
     answer = find_paper(REQUEST, scripted_llm(replies, []), CURRENT_YEAR, fake_search)
 
-    assert answer is None
+    assert isinstance(answer, NoMatch)
+    assert answer.papers_checked == 2
+    assert answer.rejections == ["1 paper: year needs < 2021"]  # NEW_PAPER
+    assert answer.explanation == "None fit."

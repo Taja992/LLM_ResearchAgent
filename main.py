@@ -15,7 +15,6 @@ from workflow import find_paper
 # Swap models by changing MODEL in .env ("provider:model-name"); see .env.example.
 DEFAULT_MODEL = "ollama:qwen2.5:7b-instruct"
 DEFAULT_REQUEST = "a paper about graph neural networks"
-NOTHING_FOUND = "No matching paper found."
 # Ollama's local server; only used when MODEL starts with "ollama:".
 OLLAMA_BASE_URL = "http://localhost:11434/v1"
 
@@ -30,7 +29,7 @@ def main() -> None:
     request = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_REQUEST
     model = os.getenv("MODEL", DEFAULT_MODEL)
     answer = find_paper(request, model, date.today().year)
-    print(answer.model_dump_json(indent=2) if answer else NOTHING_FOUND)
+    print(answer.model_dump_json(indent=2))
 
 
 if __name__ == "__main__":

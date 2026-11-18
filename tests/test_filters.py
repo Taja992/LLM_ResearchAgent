@@ -2,7 +2,7 @@
 
 import pytest
 
-from filters import check_paper, filter_papers
+from filters import check_paper, filter_papers, summarize_rejections
 from models import Comparison, Constraints, NumberRule, Paper
 
 CURRENT_YEAR = 2026
@@ -93,7 +93,9 @@ def test_missing_number_is_rejected_not_guessed() -> None:
 
     verdict = check_paper(make_paper(year=None), constraints, CURRENT_YEAR)
 
-    assert verdict.reasons == ["year is unknown, needs < 2015"]
+    assert [str(reason) for reason in verdict.reasons] == [
+        "year is unknown, needs < 2015"
+    ]
 
 
 def test_every_failed_rule_gives_a_reason() -> None:
@@ -107,7 +109,7 @@ def test_every_failed_rule_gives_a_reason() -> None:
         make_paper(year=2017, citations=50), constraints, CURRENT_YEAR
     )
 
-    assert verdict.reasons == [
+    assert [str(reason) for reason in verdict.reasons] == [
         "year is 2017, needs < 2015",
         "citations is 50, needs about 1000 (800 to 1200)",
     ]
@@ -120,3 +122,24 @@ def test_filter_papers_gives_one_verdict_per_paper_in_order() -> None:
     verdicts = filter_papers(papers, constraints, CURRENT_YEAR)
 
     assert [verdict.accepted for verdict in verdicts] == [False, True]
+
+
+def test_summarize_rejections_counts_each_rule_most_common_first() -> None:
+    constraints = Constraints(
+        topic=TOPIC,
+        year=rule(Comparison.LESS_THAN, 2015),
+        citations=rule(Comparison.AT_LEAST, 1000),
+    )
+    papers = [
+        make_paper(year=2017, citations=5000),  # fails year
+        make_paper(year=2018, citations=50),  # fails both
+        make_paper(year=2019, citations=2000),  # fails year
+        make_paper(year=2010, citations=2000),  # passes
+    ]
+
+    summary = summarize_rejections(filter_papers(papers, constraints, CURRENT_YEAR))
+
+    assert summary == [
+        "3 papers: year needs < 2015",
+        "1 paper: citations needs >= 1000",
+    ]
