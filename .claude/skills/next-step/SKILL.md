@@ -21,7 +21,7 @@ Before writing anything, tell the owner in a few lines:
 
 If there's a real choice, ask it with the **AskUserQuestion menu** in plain, everyday words (recommended option first), and wait for the answer. Never use a text list of lettered or numbered questions. Otherwise go ahead.
 
-When a step depends on an outside service (an LLM provider, a paper API, PydanticAI itself), check its current docs instead of relying on memory, and say what you checked.
+When a step depends on an outside service (an LLM provider, a paper API, PydanticAI itself), check its current docs instead of relying on memory, and say what you checked. Live OpenAlex requests are rationed: see "Working notes" in `CLAUDE.md` (one or two per step at most, through the project's code so the key is used, never raw `curl`).
 
 ## 3. Build it
 - Follow the code rules in `CLAUDE.md`.

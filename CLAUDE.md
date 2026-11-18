@@ -35,7 +35,7 @@ The owner is **learning** while building this. Understanding matters as much as 
 
 ## Commands
 
-```
+```text
 uv pip install -r requirements.txt     # install dependencies into .venv
 .venv\Scripts\python main.py "<request>"  # run the agent
 .venv\Scripts\python -m pytest         # tests
@@ -53,16 +53,17 @@ Kept short: this file loads in every session.
 - **Paper API chosen:** OpenAlex, optional `OPENALEX_API_KEY` (decision 6). Field mapping in `docs/NOTES.md`.
 - **`models.py`:** shared data models: `Paper`, `Constraints` (topic + optional year/citation `NumberRule`s + `recent` flag). Tests in `tests/test_models.py`.
 - **`rules.py`:** what each rule allows (`AllowedRange`), shared by filter and OpenAlex query.
-- **`filters.py`:** `filter_papers()` / `check_paper()` give a `Verdict` (reasons) per paper. Tests in `tests/test_filters.py`. 
+- **`filters.py`:** `filter_papers()` / `check_paper()` give a `Verdict` (reasons) per paper. Tests in `tests/test_filters.py`.
 - **`agents.py`:** LLM step 1, `extract_constraints(request, model)` → `Constraints`. Tests in `tests/test_agents.py` with `FunctionModel`; `tests/conftest.py` blocks real LLM calls. 62 tests pass in total.
 - **`openalex.py`:** `paper_from_openalex()` and `search_openalex(constraints, current_year)` (topic + year/citation rules sent as OpenAlex filters, 25 results, optional key). Tests in `tests/test_openalex.py` (9 pass, fake network via `httpx.MockTransport`).
 - **Workflow designed (decisions 9–10):** code runs fixed steps (LLM reads request → code search → code filter → LLM judges relevance, with an optional `search_papers` tool → code builds answer). Described in `README.md` "How the agent works" (README has only that section so far).
 - **Model:** local Ollama `qwen2.5:7b-instruct` is final (decision 12); no cloud LLM planned.
 - **Not yet:** the search hooked into the agent, the relevance agent, wiring, evaluation, rest of README.
-- **Next:** Phase 3 "Full `PaperAnswer`" in [docs/PLAN.md](docs/PLAN.md). OpenAlex's keyless daily budget can run out: a free `OPENALEX_API_KEY` in `.env` avoids that. Ollama must be running for real tries (the app, or `ollama serve`).
+- **Next:** Phase 3 "Full `PaperAnswer`" in [docs/PLAN.md](docs/PLAN.md). Ollama must be running for real tries (the app, or `ollama serve`).
 
 ## Working notes
 
 - **`docs/` is private** (git-ignored, this machine only). Anything graded (workflow write-up, eval set and results, reflection) goes in committed files like `README.md`, never only in `docs/`. Graded files (README etc.) must not link into `docs/`; `CLAUDE.md` and `.claude/` are committed and may.
+- **Live OpenAlex requests are rationed** (the daily budget is small). At most one or two per step, and only when the step really needs real data. Send them through the project's own code (`search_openalex` after `load_dotenv()`), so the owner's `OPENALEX_API_KEY` is used; never raw `curl`, which goes without the key. pytest never calls OpenAlex. Prefer the docs or the saved sample data.
 - Windows 11. The `.venv` has no `pip`: use `uv pip ...`.
 - pytest exit code 5 means "no tests found". That's fine before tests exist.
