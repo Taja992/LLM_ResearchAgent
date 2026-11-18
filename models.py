@@ -4,6 +4,7 @@ Each model says what the data looks like; other files decide where it comes from
 """
 
 from enum import StrEnum
+from typing import Self
 
 from pydantic import BaseModel, Field
 
@@ -88,3 +89,36 @@ class ResolvedRule(BaseModel):
 
     rule: NumberRule
     allowed: AllowedRange
+
+
+class PaperAnswer(BaseModel):
+    """The agent's final answer.
+
+    Facts are copied from a Paper (the tool's data); only `explanation` and
+    `uncertainty` come from the LLM.
+    """
+
+    title: str
+    authors: list[str]
+    year: int | None
+    citation_count: int | None
+    citation_source: str
+    url: str
+    explanation: str
+    uncertainty: str | None = None
+
+    @classmethod
+    def from_paper(
+        cls, paper: Paper, explanation: str, uncertainty: str | None = None
+    ) -> Self:
+        """Build the answer: facts from the paper, words from the LLM."""
+        return cls(
+            title=paper.title,
+            authors=paper.authors,
+            year=paper.year,
+            citation_count=paper.citation_count,
+            citation_source=paper.citation_source,
+            url=paper.url,
+            explanation=explanation,
+            uncertainty=uncertainty,
+        )

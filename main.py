@@ -7,8 +7,7 @@ import os
 import sys
 
 from dotenv import load_dotenv
-from pydantic import BaseModel
-from pydantic_ai import Agent, ToolOutput
+from pydantic_ai import Agent
 
 load_dotenv()
 os.environ.setdefault("PYDANTIC_AI_NO_BANNER", "1")
@@ -19,15 +18,10 @@ os.environ.setdefault("OLLAMA_BASE_URL", "http://localhost:11434/v1")
 DEFAULT_MODEL = "ollama:qwen2.5:7b-instruct"
 
 
-class PaperAnswer(BaseModel):
-    # TODO: title, authors, year, citation_count, citation_source, url, explanation
-    explanation: str
-
-
+# Placeholder agent, replaced when the workflow is wired up (Phase 3). It answers in
+# plain text so it never types in paper facts; real answers are models.PaperAnswer.
 agent = Agent(
     os.getenv("MODEL", DEFAULT_MODEL),
-    # answer via a tool call: more reliable on small local models
-    output_type=ToolOutput(PaperAnswer),
     retries=3,
     instructions="You help users find research papers. Use your tools; never invent citation counts.",
 )
@@ -44,4 +38,4 @@ if __name__ == "__main__":
     request = (
         sys.argv[1] if len(sys.argv) > 1 else "a paper about graph neural networks"
     )
-    print(agent.run_sync(request).output.model_dump_json(indent=2))
+    print(agent.run_sync(request).output)
