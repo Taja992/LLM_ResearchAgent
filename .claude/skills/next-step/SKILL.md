@@ -51,6 +51,8 @@ Link files as clickable paths. Keep it brief: a short list per file, not an essa
   - **Fix or remove any bullet this step made untrue**, and don't repeat a point that's already there.
   - **Link code names to their exact lines**, relative from `docs/`: `[`rebuild_abstract`](../openalex.py#L25-L33)`. Mark notes about code that doesn't exist yet "(no code yet)".
   - **Re-check every existing link** whenever code changed (any file, including formatting): open the file with line numbers and fix links that now point at the wrong lines.
+  - **Search the whole file for "(no code yet)"**, including overview sections like "Agent workflow", and update any note this step made true.
+  - **Caveats:** when something goes wrong or turns out limited (a model misbehaves, an API limit, a known weakness), add a short bullet to the "Caveats" section. It feeds the demo and the reflection.
 
 ## 7. Stop
 Leave everything uncommitted (the owner reviews and commits). Suggest a commit message, and say what the next piece would be. Don't start it.
