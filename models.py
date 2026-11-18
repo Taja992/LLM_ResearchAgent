@@ -136,9 +136,22 @@ class RelevanceJudgement(BaseModel):
     uncertainty: str | None = Field(
         default=None, description="Any doubts about the match; null if none."
     )
+    search_words: str | None = Field(
+        default=None,
+        description="If no candidate fits: better search words to try. Else null.",
+    )
 
     def chosen_from(self, candidates: list[Paper]) -> Paper | None:
         """The paper the number points at (numbers start at 1), or None."""
         if self.paper_number is None:
             return None
         return candidates[self.paper_number - 1]
+
+
+class RelevanceOutcome(BaseModel):
+    """Result of the relevance step: the chosen paper (or None) and the LLM's words."""
+
+    paper: Paper | None
+    explanation: str
+    uncertainty: str | None
+    extra_searches: int  # searches after the first: by the tool or the code fallback

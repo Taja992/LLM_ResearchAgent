@@ -19,7 +19,8 @@ user request
   ├─ 3. CODE  Filter candidates: keep, or reject with a reason (e.g. "published 2017, needs before 2015")
   │
   ├─ 4. LLM   Judge relevance: pick the best surviving candidate, explain why, note any doubts
-  │           └─ optional tool: search_papers(new wording) → runs steps 2–3 again in code
+  │           └─ if nothing fits: one more search with better words, via the search_papers
+  │              tool or a code fallback (small models rarely call tools) → steps 2–3 in code
   │
   └─ 5. CODE  Build the answer: title, authors, year, citations, source and link are copied
               from the chosen paper's OpenAlex data; the LLM supplies only the explanation
