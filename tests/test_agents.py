@@ -5,7 +5,7 @@ from typing import Any
 from pydantic_ai.messages import ModelMessage, ModelResponse, ToolCallPart
 from pydantic_ai.models.function import AgentInfo, FunctionModel
 
-from agents import extract_constraints
+from agents import CONSTRAINTS_INSTRUCTIONS, extract_constraints
 from models import Comparison, Constraints, NumberRule
 
 REQUEST = "a paper about RAG published before 2021 with more than 500 citations"
@@ -62,4 +62,4 @@ def test_llm_receives_the_request_and_instructions() -> None:
     extract_constraints(REQUEST, model=FunctionModel(fake_llm))
 
     assert REQUEST in seen[0]
-    assert '"after 2022" -> ">" 2022' in seen[1]
+    assert CONSTRAINTS_INSTRUCTIONS.strip() in seen[1]

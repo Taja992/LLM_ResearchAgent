@@ -10,20 +10,26 @@ from models import Constraints
 
 OUTPUT_RETRIES = 3  # how often the LLM may retry an answer that doesn't fit the model
 
-CONSTRAINTS_INSTRUCTIONS = """
+CONSTRAINTS_INSTRUCTIONS = """\
 Read the user's request for a research paper and fill in its constraints.
 
 - topic: the subject only, as short search words. No years or citation numbers.
 - year and citations: pick the comparison that matches the wording and copy the
   number exactly as written. Never calculate a different number.
-    "after 2022" -> ">" 2022          "2022 or later", "since 2022" -> ">=" 2022
-    "before 2015" -> "<" 2015         "2015 or earlier" -> "<=" 2015
-    "in 2020", "from 2020" -> "=" 2020
-    "more than 500" -> ">" 500        "at least 100" -> ">=" 100
-    "fewer than 50" -> "<" 50         "at most 50", "no more than 50" -> "<=" 50
-    "about", "around", "roughly", "approximately" -> "about"
+  "more than", "over", "after" and "before" do NOT include the number itself.
+    "after 2022"                       -> ">" 2022
+    "2022 or later", "since 2022"      -> ">=" 2022
+    "before 2015"                      -> "<" 2015
+    "2015 or earlier"                  -> "<=" 2015
+    "in 2020"                          -> "=" 2020
+    "more than 500", "over 500"        -> ">" 500
+    "at least 100", "100 or more"      -> ">=" 100
+    "fewer than 50", "under 50"        -> "<" 50
+    "at most 50", "no more than 50"    -> "<=" 50
+    "about", "around", "roughly", "approximately", "~" -> "about"
 - Leave year or citations empty if the user gave no rule for it. Never invent one.
-- recent: true only if the user asks for something recent, new or latest.
+- recent: true only if the request contains a word like "recent", "new", "latest"
+  or "newest". A year rule such as "after 2022" is NOT a request for recent.
   Do not turn "recent" into a year.
 """
 

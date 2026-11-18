@@ -57,8 +57,8 @@ Kept short: this file loads in every session.
 - **`openalex.py`:** `paper_from_openalex()` and `search_openalex(topic)` (real HTTP call, 25 results, optional key). Tests in `tests/test_openalex.py` (9 pass, fake network via `httpx.MockTransport`).
 - **Workflow designed (decisions 9–10):** code runs fixed steps (LLM reads request → code search → code filter → LLM judges relevance, with an optional `search_papers` tool → code builds answer). Described in `README.md` "How the agent works" (README has only that section so far).
 - **Model:** local Ollama `qwen2.5:7b-instruct` is final (decision 12); no cloud LLM planned.
-- **Not yet:** a real-Ollama try of extraction, the search hooked into the agent, the relevance agent, wiring, evaluation, rest of README.
-- **Next:** try extraction on real Ollama (needs Ollama running), then "Pass the constraints to the API" in [docs/PLAN.md](docs/PLAN.md).
+- **Not yet:** the search hooked into the agent, the relevance agent, wiring, evaluation, rest of README.
+- **Next:** Phase 2 "Pass the constraints to the API" in [docs/PLAN.md](docs/PLAN.md). Ollama must be running for real tries (the app, or `ollama serve`).
 
 ## Working notes
 
