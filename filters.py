@@ -28,11 +28,11 @@ def filter_papers(
 def check_paper(paper: Paper, constraints: Constraints, current_year: int) -> Verdict:
     """Check one paper against every rule; collect a reason for each rule it fails."""
     results = [
-        _check_number("year", paper.year, rule)
+        check_number("year", paper.year, rule)
         for rule in year_rules(constraints, current_year)
     ]
     results += [
-        _check_number("citations", paper.citation_count, rule)
+        check_number("citations", paper.citation_count, rule)
         for rule in citation_rules(constraints)
     ]
     reasons = [reason for reason in results if reason is not None]
@@ -52,7 +52,7 @@ def summarize_rejections(verdicts: list[Verdict]) -> list[str]:
     ]
 
 
-def _check_number(
+def check_number(
     label: RuleField, actual: int | None, rule: ResolvedRule
 ) -> Rejection | None:
     """Return why `actual` fails `rule`, or None if it passes. A missing number fails."""

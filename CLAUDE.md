@@ -60,9 +60,10 @@ Kept short: this file loads in every session.
 - **Model:** local Ollama `qwen2.5:7b-instruct` is final (decision 12); no cloud LLM planned.
 - **README:** "How the agent works" is final (workflow, code locations, checks, example). Setup/run/evaluation/reflection sections still to come.
 - **Evaluation method chosen (decision 31):** code checks the exact criteria, the owner scores relevance/usefulness with a 0–2 rubric. The research with sources is at the bottom of `docs/NOTES.md`, not in the README (owner's choice).
-- **`evaluation_cases.py`:** `EVALUATION_SET`, a `pydantic_evals` `Dataset` of 12 cases, each with hand-written `CaseCriteria` (decision 32). Tests in `tests/test_evaluation_cases.py`. 92 tests pass in total.
-- **Not yet:** automatic checks, running and results (Phase 4), rest of README (Phase 5).
-- **Next:** Phase 4 "Automatic checks" (`pydantic_evals` evaluators) in [docs/PLAN.md](docs/PLAN.md). Ollama must be running for real tries (the app, or `ollama serve`).
+- **`evaluation_cases.py`:** `EVALUATION_SET`, a `pydantic_evals` `Dataset` of 12 cases, each with hand-written `CaseCriteria` (decision 32). Output per run is `RunResult` (answer + papers the searches returned + search count). Tests in `tests/test_evaluation_cases.py`.
+- **`evaluation_checks.py`:** five `pydantic_evals` evaluators for the exact criteria (decision 33). Tests in `tests/test_evaluation_checks.py`. 102 tests pass in total.
+- **Not yet:** running the evaluation and recording results (Phase 4), rest of README (Phase 5).
+- **Next:** Phase 4 "Judged checks" (the owner's 0–2 rubric), then "Run it and record results" in [docs/PLAN.md](docs/PLAN.md). Ollama must be running for real tries (the app, or `ollama serve`).
 
 ## Working notes
 

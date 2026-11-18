@@ -10,7 +10,7 @@ from enum import StrEnum
 from pydantic import BaseModel, Field
 from pydantic_evals import Case, Dataset
 
-from models import Comparison, NoMatch, NumberRule, PaperAnswer
+from models import Comparison, Constraints, NoMatch, NumberRule, Paper, PaperAnswer
 
 
 class Covers(StrEnum):
@@ -42,8 +42,22 @@ class CaseCriteria(BaseModel):
         min_length=1, description="What a relevant paper is about (for the rubric)"
     )
 
+    def as_constraints(self, request: str) -> Constraints:
+        """The hand-written rules in the shape rules.py reads (topic = the request)."""
+        return Constraints(
+            topic=request, year=self.year, citations=self.citations, recent=self.recent
+        )
+
 
 Answer = PaperAnswer | NoMatch
+
+
+class RunResult(BaseModel):
+    """What one test run produced: the answer, plus every paper the searches returned."""
+
+    answer: Answer
+    papers_seen: list[Paper] = Field(description="The real OpenAlex data, to compare")
+    searches: int = Field(ge=1, description="1, or more if the agent searched again")
 
 
 def rule(comparison: str, value: int) -> NumberRule:
@@ -51,7 +65,7 @@ def rule(comparison: str, value: int) -> NumberRule:
     return NumberRule(comparison=Comparison(comparison), value=value)
 
 
-EVALUATION_SET: Dataset[str, Answer, CaseCriteria] = Dataset(
+EVALUATION_SET: Dataset[str, RunResult, CaseCriteria] = Dataset(
     name="research_scout",
     cases=[
         Case(
