@@ -270,3 +270,18 @@ def test_no_second_question_when_the_fallback_finds_nothing_new() -> None:
     assert outcome.paper is None
     assert outcome.extra_searches == 1
     assert replies == []  # only one LLM answer was needed
+
+
+def test_both_llm_steps_ask_the_model_for_temperature_zero() -> None:
+    temperatures: list[object] = []
+
+    def record(messages: list[ModelMessage], info: AgentInfo) -> ModelResponse:
+        temperatures.append((info.model_settings or {}).get("temperature"))
+        reply = GOOD_ANSWER if len(temperatures) == 1 else PICK_SECOND
+        return ModelResponse(parts=[TextPart(content=json.dumps(reply))])
+
+    model = FunctionModel(record)
+    extract_constraints(REQUEST, model)
+    judge_relevance(REQUEST, CANDIDATES, RULES, CURRENT_YEAR, model, no_search)
+
+    assert temperatures == [0.0, 0.0]  # same request, same reading, every time

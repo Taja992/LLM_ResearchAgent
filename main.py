@@ -19,15 +19,19 @@ DEFAULT_REQUEST = "a paper about graph neural networks"
 OLLAMA_BASE_URL = "http://localhost:11434/v1"
 
 
-def main() -> None:
+def configure() -> str:
+    """Load settings from .env and prepare the console; return the model to use."""
     load_dotenv()  # MODEL and OPENALEX_API_KEY come from .env
     os.environ.setdefault("OLLAMA_BASE_URL", OLLAMA_BASE_URL)
     os.environ.setdefault("PYDANTIC_AI_NO_BANNER", "1")
     if isinstance(sys.stdout, io.TextIOWrapper):
         sys.stdout.reconfigure(encoding="utf-8")  # so names like "Küttler" print right
+    return os.getenv("MODEL", DEFAULT_MODEL)
 
+
+def main() -> None:
+    model = configure()
     request = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_REQUEST
-    model = os.getenv("MODEL", DEFAULT_MODEL)
     answer = find_paper(request, model, date.today().year)
     print(answer.model_dump_json(indent=2))
 

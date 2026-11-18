@@ -1,0 +1,488 @@
+{
+  "model": "ollama:qwen2.5:7b-instruct",
+  "run_on": "2026-11-18",
+  "cases": [
+    {
+      "case": "brief_llm_agents_for_software",
+      "request": "Find a research paper about LLM agents for software engineering that was published after 2022 and has at least 100 citations. Explain why the paper is relevant and provide the source of the citation count.",
+      "answer": {
+        "title": "Demystifying LLM-Based Software Engineering Agents",
+        "authors": [
+          "Chunqiu Steven Xia",
+          "Yinlin Deng",
+          "Soren Dunn",
+          "Lingming Zhang"
+        ],
+        "year": 2025,
+        "citation_count": 1053,
+        "citation_source": "OpenAlex",
+        "url": "https://doi.org/10.1145/3715754",
+        "explanation": "The paper 'Demystifying LLM-Based Software Engineering Agents' (2025) is the most relevant to the request. It discusses recent advancements in using large language models (LLMs) for software engineering tasks, specifically focusing on autonomous agents that can perform end-to-end development tasks. The abstract mentions that these agents are equipped with the ability to use tools, run commands, and plan future actions, which aligns well with the concept of LLM agents in software engineering.",
+        "uncertainty": null
+      },
+      "searches": 1,
+      "checks": {
+        "found_when_expected": {
+          "passed": true,
+          "reason": "found a paper: True, expected one: True"
+        },
+        "year_rule": {
+          "passed": true,
+          "reason": null
+        },
+        "citation_rule": {
+          "passed": true,
+          "reason": null
+        },
+        "valid_source": {
+          "passed": true,
+          "reason": "link https://doi.org/10.1145/3715754, source OpenAlex"
+        },
+        "facts_match_search": {
+          "passed": true,
+          "reason": null
+        },
+        "explanation_matches_facts": {
+          "passed": true,
+          "reason": null
+        }
+      }
+    },
+    {
+      "case": "brief_rag_before_2021",
+      "request": "Find a paper about retrieval-augmented generation published before 2021 with more than 500 citations. Summarize its contribution in 5-7 sentences.",
+      "answer": {
+        "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+        "authors": [
+          "Patrick Lewis",
+          "Ethan Perez",
+          "Aleksandra Piktus",
+          "Fabio Petroni",
+          "Vladimir Karpukhin",
+          "Naman Goyal",
+          "Heinrich Küttler",
+          "Mike Lewis",
+          "Wen-tau Yih",
+          "Tim Rocktäschel",
+          "Sebastian Riedel",
+          "Douwe Kiela"
+        ],
+        "year": 2020,
+        "citation_count": 10307,
+        "citation_source": "OpenAlex",
+        "url": "https://doi.org/10.48550/arxiv.2005.11401",
+        "explanation": "This paper titled 'Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks' is directly about retrieval-augmented generation and was published in 2020 with over 1,000 citations. It discusses how large pre-trained language models can be enhanced by accessing external knowledge sources to improve their performance on knowledge-intensive tasks.",
+        "uncertainty": null
+      },
+      "searches": 1,
+      "checks": {
+        "found_when_expected": {
+          "passed": true,
+          "reason": "found a paper: True, expected one: True"
+        },
+        "year_rule": {
+          "passed": true,
+          "reason": null
+        },
+        "citation_rule": {
+          "passed": true,
+          "reason": null
+        },
+        "valid_source": {
+          "passed": true,
+          "reason": "link https://doi.org/10.48550/arxiv.2005.11401, source OpenAlex"
+        },
+        "facts_match_search": {
+          "passed": true,
+          "reason": null
+        },
+        "explanation_matches_facts": {
+          "passed": false,
+          "reason": "numbers not in the facts: [1000]"
+        }
+      }
+    },
+    {
+      "case": "brief_recent_tool_using_agents",
+      "request": "Find a recent paper about AI agents using tools and explain whether it would be useful for someone building autonomous software agents.",
+      "answer": {
+        "title": "AgentClinic: a multimodal benchmark for tool-using clinical AI agents",
+        "authors": [
+          "Samuel Schmidgall",
+          "Rojin Ziaei",
+          "Carl Harris",
+          "Ji Woong Kim",
+          "Eduardo Pontes Reis",
+          "Jeffrey K. Jopling",
+          "Michael Moor"
+        ],
+        "year": 2026,
+        "citation_count": 403,
+        "citation_source": "OpenAlex",
+        "url": "https://doi.org/10.1038/s41746-026-02674-7",
+        "explanation": "The paper 'AgentClinic: a multimodal benchmark for tool-using clinical AI agents' is the most relevant to the request as it discusses AI agents using tools in a clinical setting, which can be analogous to autonomous software agents. The abstract mentions evaluating large language models (LLMs) in simulated clinical environments that include patient interactions and usage of tools, making it highly pertinent to the topic.",
+        "uncertainty": null
+      },
+      "searches": 1,
+      "checks": {
+        "found_when_expected": {
+          "passed": true,
+          "reason": "found a paper: True, expected one: True"
+        },
+        "year_rule": {
+          "passed": true,
+          "reason": null
+        },
+        "valid_source": {
+          "passed": true,
+          "reason": "link https://doi.org/10.1038/s41746-026-02674-7, source OpenAlex"
+        },
+        "facts_match_search": {
+          "passed": true,
+          "reason": null
+        },
+        "explanation_matches_facts": {
+          "passed": true,
+          "reason": null
+        }
+      }
+    },
+    {
+      "case": "broad_machine_learning",
+      "request": "Find a paper about machine learning.",
+      "answer": {
+        "title": "Machine learning and deep learning",
+        "authors": [
+          "Christian Janiesch",
+          "Patrick Zschech",
+          "Kai Heinrich"
+        ],
+        "year": 2021,
+        "citation_count": 4156,
+        "citation_source": "OpenAlex",
+        "url": "https://doi.org/10.1007/s12525-021-00475-2",
+        "explanation": "This paper provides a detailed explanation of machine learning and its subfield, deep learning. It covers the fundamental concepts and applications of machine learning, making it highly relevant to the request for information about machine learning.",
+        "uncertainty": null
+      },
+      "searches": 1,
+      "checks": {
+        "found_when_expected": {
+          "passed": true,
+          "reason": "found a paper: True, expected one: True"
+        },
+        "valid_source": {
+          "passed": true,
+          "reason": "link https://doi.org/10.1007/s12525-021-00475-2, source OpenAlex"
+        },
+        "facts_match_search": {
+          "passed": true,
+          "reason": null
+        },
+        "explanation_matches_facts": {
+          "passed": true,
+          "reason": null
+        }
+      }
+    },
+    {
+      "case": "broad_computer_vision_highly_cited",
+      "request": "Find a paper about computer vision with at least 10000 citations.",
+      "answer": {
+        "title": "Rethinking the Inception Architecture for Computer Vision",
+        "authors": [
+          "Christian Szegedy",
+          "Vincent Vanhoucke",
+          "Sergey Ioffe",
+          "Jon Shlens",
+          "Zbigniew Wojna"
+        ],
+        "year": 2016,
+        "citation_count": 38427,
+        "citation_source": "OpenAlex",
+        "url": "https://doi.org/10.1109/cvpr.2016.308",
+        "explanation": "Paper number 2, 'Rethinking the Inception Architecture for Computer Vision,' has a high citation count of 38,427 and directly addresses computer vision. The paper discusses convolutional networks, which are central to many state-of-the-art solutions in computer vision tasks.",
+        "uncertainty": null
+      },
+      "searches": 1,
+      "checks": {
+        "found_when_expected": {
+          "passed": true,
+          "reason": "found a paper: True, expected one: True"
+        },
+        "citation_rule": {
+          "passed": true,
+          "reason": null
+        },
+        "valid_source": {
+          "passed": true,
+          "reason": "link https://doi.org/10.1109/cvpr.2016.308, source OpenAlex"
+        },
+        "facts_match_search": {
+          "passed": true,
+          "reason": null
+        },
+        "explanation_matches_facts": {
+          "passed": true,
+          "reason": null
+        }
+      }
+    },
+    {
+      "case": "narrow_gnn_before_2015",
+      "request": "A paper on graph neural networks from before 2015 with at least 1000 citations.",
+      "answer": {
+        "title": "The Graph Neural Network Model",
+        "authors": [
+          "Franco Scarselli",
+          "Marco Gori",
+          "Ah Chung Tsoi",
+          "Markus Hagenbuchner",
+          "Gabriele Monfardini"
+        ],
+        "year": 2008,
+        "citation_count": 12649,
+        "citation_source": "OpenAlex",
+        "url": "https://doi.org/10.1109/tnn.2008.2005605",
+        "explanation": "The paper titled 'The Graph Neural Network Model' was published in 2008 and has 12649 citations. It introduces the concept of graph neural networks (GNNs) which can process data represented in graph domains, making it a foundational work that predates 2015 and meets the citation requirement.",
+        "uncertainty": null
+      },
+      "searches": 1,
+      "checks": {
+        "found_when_expected": {
+          "passed": true,
+          "reason": "found a paper: True, expected one: True"
+        },
+        "year_rule": {
+          "passed": true,
+          "reason": null
+        },
+        "citation_rule": {
+          "passed": true,
+          "reason": null
+        },
+        "valid_source": {
+          "passed": true,
+          "reason": "link https://doi.org/10.1109/tnn.2008.2005605, source OpenAlex"
+        },
+        "facts_match_search": {
+          "passed": true,
+          "reason": null
+        },
+        "explanation_matches_facts": {
+          "passed": true,
+          "reason": null
+        }
+      }
+    },
+    {
+      "case": "exact_year_transformer_2017",
+      "request": "Find a paper about the transformer architecture published in 2017.",
+      "answer": {
+        "title": "Weighted Transformer Network for Machine Translation",
+        "authors": [
+          "Karim Ahmed",
+          "Nitish Shirish Keskar",
+          "Richard Socher"
+        ],
+        "year": 2017,
+        "citation_count": 175,
+        "citation_source": "OpenAlex",
+        "url": "https://doi.org/10.48550/arxiv.1711.02132",
+        "explanation": "The paper titled 'Weighted Transformer Network for Machine Translation' published in 2017 discusses a new architecture that uses only self-attention and feed-forward layers, which is referred to as the transformer architecture. This matches the request for a paper about the transformer architecture published in 2017.",
+        "uncertainty": null
+      },
+      "searches": 1,
+      "checks": {
+        "found_when_expected": {
+          "passed": true,
+          "reason": "found a paper: True, expected one: True"
+        },
+        "year_rule": {
+          "passed": true,
+          "reason": null
+        },
+        "valid_source": {
+          "passed": true,
+          "reason": "link https://doi.org/10.48550/arxiv.1711.02132, source OpenAlex"
+        },
+        "facts_match_search": {
+          "passed": true,
+          "reason": null
+        },
+        "explanation_matches_facts": {
+          "passed": true,
+          "reason": null
+        }
+      }
+    },
+    {
+      "case": "narrow_federated_medical_2020",
+      "request": "Find a paper on federated learning for medical imaging published in 2020 with more than 200 citations.",
+      "answer": {
+        "title": "Secure, privacy-preserving and federated machine learning in medical imaging",
+        "authors": [
+          "Georgios A. Kaissis",
+          "Marcus R. Makowski",
+          "Daniel Rueckert",
+          "Rickmer Braren"
+        ],
+        "year": 2020,
+        "citation_count": 2077,
+        "citation_source": "OpenAlex",
+        "url": "https://doi.org/10.1038/s42256-020-0186-1",
+        "explanation": "This paper titled 'Secure, privacy-preserving and federated machine learning in medical imaging' is the most relevant to the request. It discusses federated learning specifically in the context of medical imaging, which aligns with the user's interest. The publication year (2020) and citation count (2077) also match the criteria.",
+        "uncertainty": null
+      },
+      "searches": 1,
+      "checks": {
+        "found_when_expected": {
+          "passed": true,
+          "reason": "found a paper: True, expected one: True"
+        },
+        "year_rule": {
+          "passed": true,
+          "reason": null
+        },
+        "citation_rule": {
+          "passed": true,
+          "reason": null
+        },
+        "valid_source": {
+          "passed": true,
+          "reason": "link https://doi.org/10.1038/s42256-020-0186-1, source OpenAlex"
+        },
+        "facts_match_search": {
+          "passed": true,
+          "reason": null
+        },
+        "explanation_matches_facts": {
+          "passed": true,
+          "reason": null
+        }
+      }
+    },
+    {
+      "case": "ambiguous_around_numbers",
+      "request": "A paper about contrastive learning from 2019 or later with around 1000 citations.",
+      "answer": {
+        "title": "Contrastive Learning for Sequential Recommendation",
+        "authors": [
+          "Xu Xie",
+          "Fei Sun",
+          "Zhaoyang Liu",
+          "Shiwen Wu",
+          "Jinyang Gao",
+          "Jiandong Zhang",
+          "Bolin Ding",
+          "Bin Cui"
+        ],
+        "year": 2022,
+        "citation_count": 1225,
+        "citation_source": "OpenAlex",
+        "url": "https://doi.org/10.1109/icde53745.2022.00099",
+        "explanation": "The paper 'Contrastive Learning for Sequential Recommendation' published in 2022 with 1225 citations is the most relevant to the request. It discusses contrastive learning, a topic that aligns well with the user's interest, and it meets the criteria of being from 2019 or later and having around 1000 citations.",
+        "uncertainty": null
+      },
+      "searches": 1,
+      "checks": {
+        "found_when_expected": {
+          "passed": true,
+          "reason": "found a paper: True, expected one: True"
+        },
+        "year_rule": {
+          "passed": true,
+          "reason": null
+        },
+        "citation_rule": {
+          "passed": false,
+          "reason": "citations is 1225, needs about 1000 (800 to 1200)"
+        },
+        "valid_source": {
+          "passed": true,
+          "reason": "link https://doi.org/10.1109/icde53745.2022.00099, source OpenAlex"
+        },
+        "facts_match_search": {
+          "passed": true,
+          "reason": null
+        },
+        "explanation_matches_facts": {
+          "passed": true,
+          "reason": null
+        }
+      }
+    },
+    {
+      "case": "ambiguous_transformers",
+      "request": "something about transformers",
+      "answer": {
+        "title": "A survey of transformers",
+        "authors": [
+          "Tianyang Lin",
+          "Yuxin Wang",
+          "Xiangyang Liu",
+          "Xipeng Qiu"
+        ],
+        "year": 2022,
+        "citation_count": 2135,
+        "citation_source": "OpenAlex",
+        "url": "https://doi.org/10.1016/j.aiopen.2022.10.001",
+        "explanation": "This paper is titled 'A survey of transformers' and provides a comprehensive review of various Transformer variants, making it highly relevant to the topic of transformers in general.",
+        "uncertainty": null
+      },
+      "searches": 1,
+      "checks": {
+        "found_when_expected": {
+          "passed": true,
+          "reason": "found a paper: True, expected one: True"
+        },
+        "valid_source": {
+          "passed": true,
+          "reason": "link https://doi.org/10.1016/j.aiopen.2022.10.001, source OpenAlex"
+        },
+        "facts_match_search": {
+          "passed": true,
+          "reason": null
+        },
+        "explanation_matches_facts": {
+          "passed": true,
+          "reason": null
+        }
+      }
+    },
+    {
+      "case": "no_paper_video_diffusion_before_2012",
+      "request": "Find a paper about diffusion models for video generation published before 2012 with more than 1000 citations.",
+      "answer": {
+        "message": "No matching paper found.",
+        "papers_checked": 25,
+        "rejections": [],
+        "explanation": "None of the provided papers match the request for a paper about diffusion models for video generation published before 2012 with more than 1000 citations."
+      },
+      "searches": 2,
+      "checks": {
+        "found_when_expected": {
+          "passed": true,
+          "reason": "found a paper: False, expected one: False"
+        }
+      }
+    },
+    {
+      "case": "no_paper_llm_knitting_before_2015",
+      "request": "A paper about using large language models to grade knitting patterns, published before 2015.",
+      "answer": {
+        "message": "No matching paper found.",
+        "papers_checked": 25,
+        "rejections": [],
+        "explanation": "None of the provided papers directly address the use of large language models to grade knitting patterns, as requested. The closest match is paper [4], which discusses leveraging large language models for automated insight generation in textile manufacturing, but it does not specifically mention grading or pattern evaluation."
+      },
+      "searches": 2,
+      "checks": {
+        "found_when_expected": {
+          "passed": true,
+          "reason": "found a paper: False, expected one: False"
+        }
+      }
+    }
+  ],
+  "crashed": {}
+}

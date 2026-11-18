@@ -38,6 +38,7 @@ The owner is **learning** while building this. Understanding matters as much as 
 ```text
 uv pip install -r requirements.txt     # install dependencies into .venv
 .venv\Scripts\python main.py "<request>"  # run the agent
+.venv\Scripts\python evaluate.py      # real evaluation run (live OpenAlex: run on purpose)
 .venv\Scripts\python -m pytest         # tests
 .venv\Scripts\python -m mypy .         # type check (VS Code's Mypy extension uses this one too)
 uvx ruff format .                      # auto-format the code
@@ -61,9 +62,10 @@ Kept short: this file loads in every session.
 - **README:** "How the agent works" is final (workflow, code locations, checks, example). Setup/run/evaluation/reflection sections still to come.
 - **Evaluation method chosen (decision 31):** code checks the exact criteria, the owner scores relevance/usefulness with a 0–2 rubric. The research with sources is at the bottom of `docs/NOTES.md`, not in the README (owner's choice).
 - **`evaluation_cases.py`:** `EVALUATION_SET`, a `pydantic_evals` `Dataset` of 12 cases, each with hand-written `CaseCriteria` (decision 32). Output per run is `RunResult` (answer + papers the searches returned + search count). Tests in `tests/test_evaluation_cases.py`.
-- **`evaluation_checks.py`:** five `pydantic_evals` evaluators for the exact criteria (decision 33). Tests in `tests/test_evaluation_checks.py`. 102 tests pass in total.
-- **Not yet:** running the evaluation and recording results (Phase 4), rest of README (Phase 5).
-- **Next:** Phase 4 "Judged checks" (the owner's 0–2 rubric), then "Run it and record results" in [docs/PLAN.md](docs/PLAN.md). Ollama must be running for real tries (the app, or `ollama serve`).
+- **`evaluation_checks.py`:** five `pydantic_evals` evaluators for the exact criteria (decision 33). Tests in `tests/test_evaluation_checks.py`.
+- **`evaluate.py`:** runs the evaluation for real (`.venv\Scripts\python evaluate.py`; uses live OpenAlex, run on purpose). Results in `evaluation_results.json` (run 2, 53/55 checks) and `evaluation_results_before_fixes.json` (run 1, 48/50). Both agents use temperature 0 (decision 34). 106 tests pass in total. **All code is done.**
+- **Not yet:** owner's rubric scores, results table in the README (Phase 4), rest of README (Phase 5). No code needed.
+- **Next:** Phase 4 "Judged checks" (write the 0–2 rubric; owner scores the 12 answers in `evaluation_results.json`), then "Record results" in the README in [docs/PLAN.md](docs/PLAN.md). Ollama must be running for real tries (the app, or `ollama serve`).
 
 ## Working notes
 

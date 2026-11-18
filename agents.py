@@ -11,6 +11,7 @@ from dataclasses import dataclass
 
 from pydantic_ai import Agent, ModelRetry, NativeOutput, RunContext
 from pydantic_ai.models import Model
+from pydantic_ai.settings import ModelSettings
 
 from filters import filter_papers
 from models import Constraints, Paper, RelevanceJudgement, RelevanceOutcome
@@ -21,6 +22,9 @@ OUTPUT_RETRIES = 3  # how often the LLM may retry an answer that doesn't fit the
 MAX_CANDIDATES_FOR_LLM = 10
 MAX_ABSTRACT_CHARS = 500
 MAX_EXTRA_SEARCHES = 1  # the relevance LLM may search again once per request
+# Temperature 0: always the most likely answer, so the same request is read the
+# same way every time (the first evaluation run saw "before 2012" dropped).
+STEADY_ANSWERS = ModelSettings(temperature=0.0)
 
 CONSTRAINTS_INSTRUCTIONS = """\
 Read the user's request for a research paper and fill in its constraints.
@@ -49,6 +53,7 @@ constraints_agent = Agent(
     output_type=NativeOutput(Constraints),
     instructions=CONSTRAINTS_INSTRUCTIONS,
     retries=OUTPUT_RETRIES,
+    model_settings=STEADY_ANSWERS,
 )
 
 
@@ -93,6 +98,7 @@ relevance_agent = Agent(
     deps_type=RelevanceDeps,
     instructions=RELEVANCE_INSTRUCTIONS,
     retries=OUTPUT_RETRIES,
+    model_settings=STEADY_ANSWERS,
 )
 
 

@@ -117,6 +117,17 @@ class ExplanationMatchesFacts(Evaluator[str, RunResult, CaseCriteria]):
         return {"explanation_matches_facts": EvaluationReason(not wrong, reason)}
 
 
+def all_checks(current_year: int) -> list[Evaluator[str, RunResult, CaseCriteria]]:
+    """Every automatic check, ready to attach to the evaluation set."""
+    return [
+        FoundWhenExpected(),
+        KeepsRules(current_year),
+        ValidSource(),
+        FactsMatchSearch(),
+        ExplanationMatchesFacts(),
+    ]
+
+
 def _criteria(ctx: Context) -> CaseCriteria:
     if ctx.metadata is None:
         raise ValueError(f"Test case {ctx.name!r} has no criteria")

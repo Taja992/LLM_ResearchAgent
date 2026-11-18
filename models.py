@@ -145,7 +145,8 @@ class RelevanceJudgement(BaseModel):
         description="Number of the best matching candidate, or null if none fits."
     )
     explanation: str = Field(
-        description="Why it matches, in the form the user asked for (or why none fit)."
+        description="Do what the request asks, e.g. a 5-7 sentence summary if it "
+        "asks for one; else 2-3 sentences on why the paper fits (or why none fit)."
     )
     uncertainty: str | None = Field(
         default=None, description="Any doubts about the match; null if none."
