@@ -1,6 +1,16 @@
 """Tests for openalex.py. Uses saved sample data, never the live API."""
 
-from openalex import CITATION_SOURCE, paper_from_openalex, rebuild_abstract
+import httpx
+import pytest
+
+from openalex import (
+    API_KEY_ENV_VAR,
+    CITATION_SOURCE,
+    OPENALEX_WORKS_URL,
+    paper_from_openalex,
+    rebuild_abstract,
+    search_openalex,
+)
 
 # Trimmed copy of a real OpenAlex result (fetched by hand on 2026-11-18).
 SAMPLE_WORK = {
@@ -58,3 +68,57 @@ def test_rebuild_abstract_puts_words_in_position_order() -> None:
 def test_rebuild_abstract_handles_no_abstract() -> None:
     assert rebuild_abstract(None) is None
     assert rebuild_abstract({}) is None
+
+
+def fake_openalex(
+    seen: list[httpx.Request], status_code: int = 200
+) -> httpx.MockTransport:
+    """A fake network: records each request and answers with SAMPLE_WORK."""
+
+    def handle(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        return httpx.Response(status_code, json={"results": [SAMPLE_WORK]})
+
+    return httpx.MockTransport(handle)
+
+
+def test_search_returns_papers_from_the_response(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv(API_KEY_ENV_VAR, raising=False)
+    seen: list[httpx.Request] = []
+
+    papers = search_openalex("graph neural networks", transport=fake_openalex(seen))
+
+    assert [paper.title for paper in papers] == ["The Graph Neural Network Model"]
+    assert papers[0].citation_count == 12638
+
+
+def test_search_sends_topic_and_no_key_when_none_set(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv(API_KEY_ENV_VAR, raising=False)
+    seen: list[httpx.Request] = []
+
+    search_openalex("graph neural networks", transport=fake_openalex(seen))
+
+    request = seen[0]
+    assert str(request.url).startswith(OPENALEX_WORKS_URL)
+    assert request.url.params["search"] == "graph neural networks"
+    assert "api_key" not in request.url.params
+
+
+def test_search_sends_api_key_when_set(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv(API_KEY_ENV_VAR, "test-key")
+    seen: list[httpx.Request] = []
+
+    search_openalex("graph neural networks", transport=fake_openalex(seen))
+
+    assert seen[0].url.params["api_key"] == "test-key"
+
+
+def test_search_raises_on_server_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv(API_KEY_ENV_VAR, raising=False)
+
+    with pytest.raises(httpx.HTTPStatusError):
+        search_openalex("anything", transport=fake_openalex([], status_code=500))

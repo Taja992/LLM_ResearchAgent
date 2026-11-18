@@ -1,7 +1,8 @@
 """Research agent starting point.
 
-    python main.py "a paper on graph neural networks from before 2015 with at least 1000 citations"
+python main.py "a paper on graph neural networks from before 2015 with at least 1000 citations"
 """
+
 import os
 import sys
 
@@ -25,7 +26,8 @@ class PaperAnswer(BaseModel):
 
 agent = Agent(
     os.getenv("MODEL", DEFAULT_MODEL),
-    output_type=ToolOutput(PaperAnswer),  # answer via a tool call: more reliable on small local models
+    # answer via a tool call: more reliable on small local models
+    output_type=ToolOutput(PaperAnswer),
     retries=3,
     instructions="You help users find research papers. Use your tools; never invent citation counts.",
 )
@@ -39,5 +41,7 @@ def search_papers(query: str) -> list[dict]:
 
 
 if __name__ == "__main__":
-    request = sys.argv[1] if len(sys.argv) > 1 else "a paper about graph neural networks"
+    request = (
+        sys.argv[1] if len(sys.argv) > 1 else "a paper about graph neural networks"
+    )
     print(agent.run_sync(request).output.model_dump_json(indent=2))

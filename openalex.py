@@ -3,11 +3,22 @@
 Plain code, no LLM: every fact here is copied from OpenAlex's data.
 """
 
+import os
 from typing import Any
 
+import httpx
 from pydantic import BaseModel
 
 CITATION_SOURCE = "OpenAlex"
+OPENALEX_WORKS_URL = "https://api.openalex.org/works"
+API_KEY_ENV_VAR = "OPENALEX_API_KEY"  # optional; read from the environment (.env)
+RESULTS_PER_SEARCH = 25
+REQUEST_TIMEOUT_SECONDS = 10.0
+# Only ask OpenAlex for the fields paper_from_openalex() uses: smaller, faster responses.
+SELECTED_FIELDS = (
+    "id,doi,display_name,publication_year,"
+    "cited_by_count,authorships,abstract_inverted_index"
+)
 
 
 class Paper(BaseModel):
@@ -49,3 +60,25 @@ def paper_from_openalex(work: dict[str, Any]) -> Paper:
         url=work.get("doi") or work["id"],
         abstract=rebuild_abstract(work.get("abstract_inverted_index")),
     )
+
+
+def search_openalex(
+    topic: str, transport: httpx.BaseTransport | None = None
+) -> list[Paper]:
+    """Search OpenAlex for papers on a topic and return them as Papers.
+
+    `transport` is only for tests: they pass a fake network so no real request is made.
+    """
+    params: dict[str, str | int] = {
+        "search": topic,
+        "per_page": RESULTS_PER_SEARCH,
+        "select": SELECTED_FIELDS,
+    }
+    api_key = os.getenv(API_KEY_ENV_VAR)
+    if api_key:
+        params["api_key"] = api_key
+
+    with httpx.Client(transport=transport, timeout=REQUEST_TIMEOUT_SECONDS) as client:
+        response = client.get(OPENALEX_WORKS_URL, params=params)
+    response.raise_for_status()  # stop with an error on 4xx/5xx instead of using bad data
+    return [paper_from_openalex(work) for work in response.json()["results"]]
