@@ -58,8 +58,9 @@ Kept short: this file loads in every session.
 - **`openalex.py`:** `paper_from_openalex()` and `search_openalex(constraints, current_year)` (topic + year/citation rules sent as OpenAlex filters, 25 results, optional key). Tests in `tests/test_openalex.py` (9 pass, fake network via `httpx.MockTransport`).
 - **Workflow designed (decisions 9–10):** code runs fixed steps (LLM reads request → code search → code filter → LLM judges relevance, with an optional `search_papers` tool → code builds answer). Described in `README.md` "How the agent works" (README has only that section so far).
 - **Model:** local Ollama `qwen2.5:7b-instruct` is final (decision 12); no cloud LLM planned.
-- **Not yet:** README workflow section update (remove "work in progress"), evaluation, rest of README.
-- **Next:** Phase 3 "Update the README workflow section" in [docs/PLAN.md](docs/PLAN.md), then Phase 4 (evaluation). The "Explanation length" box is for Phase 4. Ollama must be running for real tries (the app, or `ollama serve`).
+- **README:** "How the agent works" is final (workflow, code locations, checks, example). Setup/run/evaluation/reflection sections still to come.
+- **Not yet:** evaluation (Phase 4), rest of README (Phase 5).
+- **Next:** Phase 4 "Read up on agent evaluation" in [docs/PLAN.md](docs/PLAN.md). Phase 3 is complete. Ollama must be running for real tries (the app, or `ollama serve`).
 
 ## Working notes
 
