@@ -122,3 +122,23 @@ class PaperAnswer(BaseModel):
             explanation=explanation,
             uncertainty=uncertainty,
         )
+
+
+class RelevanceJudgement(BaseModel):
+    """The LLM's verdict on the candidates: which one fits best, and why."""
+
+    paper_number: int | None = Field(
+        description="Number of the best matching candidate, or null if none fits."
+    )
+    explanation: str = Field(
+        description="Why it matches, in the form the user asked for (or why none fit)."
+    )
+    uncertainty: str | None = Field(
+        default=None, description="Any doubts about the match; null if none."
+    )
+
+    def chosen_from(self, candidates: list[Paper]) -> Paper | None:
+        """The paper the number points at (numbers start at 1), or None."""
+        if self.paper_number is None:
+            return None
+        return candidates[self.paper_number - 1]
