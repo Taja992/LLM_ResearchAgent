@@ -22,6 +22,11 @@ The owner is **learning** while building this. Understanding matters as much as 
 
 - **LLM vs code split:** the LLM understands the request and judges relevance; plain Python does anything that must be exact (calling the API, filtering by year and citations). Keep that line obvious in the code, because the assignment grades it.
 - **Never trust the LLM with facts.** Title, authors, year, citation count and link must come from the tool's data.
+- **Quality first (owner's priority):** good design patterns and coding practices, no code smells, clean easy-to-read code.
+  - **Separation of concerns:** one clear job per file and per function (`models.py` data shapes, `openalex.py` talking to OpenAlex, `main.py` the workflow). Don't mix fetching, checking and presenting in one function.
+  - **Don't reinvent the wheel:** use what Python, Pydantic, PydanticAI, httpx and pytest already provide before writing your own. Say which built-in feature was used.
+  - **No smells:** no duplicated logic, no long functions or deep nesting, no dead code or unused imports, no vague names, no catch-all `except`.
+  - Before `/check`, review the new code against these points and fix it; mention anything you chose to leave.
 - Type hints everywhere. Pydantic models for anything structured.
 - No magic numbers or strings: use named constants or settings.
 - Don't build ahead: add structure only when a step needs it.
@@ -46,7 +51,8 @@ Kept short: this file loads in every session.
 - **Exists:** `main.py` skeleton (a PydanticAI `Agent`, an empty `search_papers` tool, a `PaperAnswer` model with only `explanation`). It runs end to end on local Ollama (`qwen2.5:7b-instruct`); any model swaps in via `MODEL` in `.env`. `requirements.txt` (pydantic-ai-slim 2.68, httpx, python-dotenv, pytest). A `.venv` made by `uv` with Python 3.12.
 - **Git:** initialised, first commit made (code, `CLAUDE.md`, `.claude/`, `.vscode/`; not `docs/` or `.env`).
 - **Paper API chosen:** OpenAlex, optional `OPENALEX_API_KEY` (decision 6). Field mapping in `docs/NOTES.md`.
-- **`openalex.py`:** `Paper` model, `paper_from_openalex()`, and `search_openalex(topic)` (real HTTP call, 25 results, optional key). Tests in `tests/test_openalex.py` (9 pass, fake network via `httpx.MockTransport`).
+- **`models.py`:** shared data models (`Paper` so far; `Constraints` goes here next).
+- **`openalex.py`:** `paper_from_openalex()` and `search_openalex(topic)` (real HTTP call, 25 results, optional key). Tests in `tests/test_openalex.py` (9 pass, fake network via `httpx.MockTransport`).
 - **Workflow designed (decisions 9–10):** code runs fixed steps (LLM reads request → code search → code filter → LLM judges relevance, with an optional `search_papers` tool → code builds answer). Described in `README.md` "How the agent works" (README has only that section so far).
 - **Model:** local Ollama `qwen2.5:7b-instruct` is final (decision 12); no cloud LLM planned.
 - **Not yet:** the search hooked into the agent, constraints, filtering, the relevance agent, wiring, evaluation, rest of README.

@@ -29,7 +29,9 @@ When a step depends on an outside service (an LLM provider, a paper API, Pydanti
 - Keep it to what this piece needs. Don't add anything for "later".
 
 ## 4. Check it
-Run the `/check` skill. Fix anything it reports before moving on.
+- **Review your own code first** against the "Quality first" rules in `CLAUDE.md`: separation of concerns, nothing reinvented that a library already does, no smells (duplication, long functions, vague names, dead code). Fix what you find.
+- Then run the `/check` skill. Fix anything it reports before moving on.
+- In step 5, say in one line what the review found or changed.
 
 ## 5. Explain what was built
 In plain words, walk through each new or changed file:

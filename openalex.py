@@ -7,7 +7,8 @@ import os
 from typing import Any
 
 import httpx
-from pydantic import BaseModel
+
+from models import Paper
 
 CITATION_SOURCE = "OpenAlex"
 OPENALEX_WORKS_URL = "https://api.openalex.org/works"
@@ -19,18 +20,6 @@ SELECTED_FIELDS = (
     "id,doi,display_name,publication_year,"
     "cited_by_count,authorships,abstract_inverted_index"
 )
-
-
-class Paper(BaseModel):
-    """One research paper, with facts taken from the search tool's data."""
-
-    title: str
-    authors: list[str]
-    year: int | None
-    citation_count: int | None
-    citation_source: str
-    url: str
-    abstract: str | None
 
 
 def rebuild_abstract(inverted_index: dict[str, list[int]] | None) -> str | None:

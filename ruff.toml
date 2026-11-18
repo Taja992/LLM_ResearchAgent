@@ -1,0 +1,17 @@
+# Ruff settings: formatter + linter. Run via /check (uvx ruff ...).
+target-version = "py312"
+
+[lint]
+# On top of ruff's default rules (real errors such as undefined names):
+extend-select = [
+    "B",    # bugbear: likely bugs and risky patterns
+    "SIM",  # simplify: code that can be written more simply
+    "UP",   # pyupgrade: use modern Python syntax
+    "N",    # pep8-naming: clear, consistent names
+    "I",    # isort: tidy, sorted imports
+    "C90",  # mccabe: flag functions that are too complex
+    "RET",  # return: clean, consistent returns
+]
+
+[lint.mccabe]
+max-complexity = 8
