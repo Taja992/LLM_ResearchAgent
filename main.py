@@ -1,41 +1,37 @@
-"""Research agent starting point.
+"""Run the research agent from the command line.
 
 python main.py "a paper on graph neural networks from before 2015 with at least 1000 citations"
 """
 
+import io
 import os
 import sys
+from datetime import date
 
 from dotenv import load_dotenv
-from pydantic_ai import Agent
 
-load_dotenv()
-os.environ.setdefault("PYDANTIC_AI_NO_BANNER", "1")
-# Ollama's local server; only used when MODEL starts with "ollama:".
-os.environ.setdefault("OLLAMA_BASE_URL", "http://localhost:11434/v1")
+from workflow import find_paper
 
 # Swap models by changing MODEL in .env ("provider:model-name"); see .env.example.
 DEFAULT_MODEL = "ollama:qwen2.5:7b-instruct"
+DEFAULT_REQUEST = "a paper about graph neural networks"
+NOTHING_FOUND = "No matching paper found."
+# Ollama's local server; only used when MODEL starts with "ollama:".
+OLLAMA_BASE_URL = "http://localhost:11434/v1"
 
 
-# Placeholder agent, replaced when the workflow is wired up (Phase 3). It answers in
-# plain text so it never types in paper facts; real answers are models.PaperAnswer.
-agent = Agent(
-    os.getenv("MODEL", DEFAULT_MODEL),
-    retries=3,
-    instructions="You help users find research papers. Use your tools; never invent citation counts.",
-)
+def main() -> None:
+    load_dotenv()  # MODEL and OPENALEX_API_KEY come from .env
+    os.environ.setdefault("OLLAMA_BASE_URL", OLLAMA_BASE_URL)
+    os.environ.setdefault("PYDANTIC_AI_NO_BANNER", "1")
+    if isinstance(sys.stdout, io.TextIOWrapper):
+        sys.stdout.reconfigure(encoding="utf-8")  # so names like "Küttler" print right
 
-
-@agent.tool_plain
-def search_papers(query: str) -> list[dict]:
-    """Search for papers on a topic."""
-    # TODO: call a real API (OpenAlex, Semantic Scholar, Crossref...)
-    return []
+    request = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_REQUEST
+    model = os.getenv("MODEL", DEFAULT_MODEL)
+    answer = find_paper(request, model, date.today().year)
+    print(answer.model_dump_json(indent=2) if answer else NOTHING_FOUND)
 
 
 if __name__ == "__main__":
-    request = (
-        sys.argv[1] if len(sys.argv) > 1 else "a paper about graph neural networks"
-    )
-    print(agent.run_sync(request).output)
+    main()
