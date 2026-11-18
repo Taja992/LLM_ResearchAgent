@@ -109,7 +109,7 @@ def test_every_failed_rule_gives_a_reason() -> None:
 
     assert verdict.reasons == [
         "year is 2017, needs < 2015",
-        "citations is 50, needs about 1000 (±200)",
+        "citations is 50, needs about 1000 (800 to 1200)",
     ]
 
 

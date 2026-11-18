@@ -3,6 +3,7 @@
 import httpx
 import pytest
 
+from models import Comparison, Constraints, NumberRule
 from openalex import (
     API_KEY_ENV_VAR,
     CITATION_SOURCE,
@@ -11,6 +12,9 @@ from openalex import (
     rebuild_abstract,
     search_openalex,
 )
+
+CURRENT_YEAR = 2026
+TOPIC_ONLY = Constraints(topic="graph neural networks")
 
 # Trimmed copy of a real OpenAlex result (fetched by hand on 2026-11-18).
 SAMPLE_WORK = {
@@ -88,7 +92,7 @@ def test_search_returns_papers_from_the_response(
     monkeypatch.delenv(API_KEY_ENV_VAR, raising=False)
     seen: list[httpx.Request] = []
 
-    papers = search_openalex("graph neural networks", transport=fake_openalex(seen))
+    papers = search_openalex(TOPIC_ONLY, CURRENT_YEAR, transport=fake_openalex(seen))
 
     assert [paper.title for paper in papers] == ["The Graph Neural Network Model"]
     assert papers[0].citation_count == 12638
@@ -100,7 +104,7 @@ def test_search_sends_topic_and_no_key_when_none_set(
     monkeypatch.delenv(API_KEY_ENV_VAR, raising=False)
     seen: list[httpx.Request] = []
 
-    search_openalex("graph neural networks", transport=fake_openalex(seen))
+    search_openalex(TOPIC_ONLY, CURRENT_YEAR, transport=fake_openalex(seen))
 
     request = seen[0]
     assert str(request.url).startswith(OPENALEX_WORKS_URL)
@@ -112,7 +116,7 @@ def test_search_sends_api_key_when_set(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv(API_KEY_ENV_VAR, "test-key")
     seen: list[httpx.Request] = []
 
-    search_openalex("graph neural networks", transport=fake_openalex(seen))
+    search_openalex(TOPIC_ONLY, CURRENT_YEAR, transport=fake_openalex(seen))
 
     assert seen[0].url.params["api_key"] == "test-key"
 
@@ -121,4 +125,74 @@ def test_search_raises_on_server_error(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv(API_KEY_ENV_VAR, raising=False)
 
     with pytest.raises(httpx.HTTPStatusError):
-        search_openalex("anything", transport=fake_openalex([], status_code=500))
+        search_openalex(
+            TOPIC_ONLY, CURRENT_YEAR, transport=fake_openalex([], status_code=500)
+        )
+
+
+def rule(comparison: Comparison, value: int) -> NumberRule:
+    return NumberRule(comparison=comparison, value=value)
+
+
+def sent_filter(
+    constraints: Constraints, monkeypatch: pytest.MonkeyPatch
+) -> str | None:
+    """Run a search on the fake network and return the 'filter' it sent, if any."""
+    monkeypatch.delenv(API_KEY_ENV_VAR, raising=False)
+    seen: list[httpx.Request] = []
+    search_openalex(constraints, CURRENT_YEAR, transport=fake_openalex(seen))
+    return seen[0].url.params.get("filter")
+
+
+@pytest.mark.parametrize(
+    ("constraints", "expected_filter"),
+    [
+        (TOPIC_ONLY, None),
+        (
+            Constraints(topic="rag", year=rule(Comparison.MORE_THAN, 2022)),
+            "publication_year:>2022",
+        ),
+        (  # OpenAlex has no >=, so "2022 or later" becomes ">2021"
+            Constraints(topic="rag", year=rule(Comparison.AT_LEAST, 2022)),
+            "publication_year:>2021",
+        ),
+        (
+            Constraints(topic="rag", year=rule(Comparison.AT_MOST, 2015)),
+            "publication_year:<2016",
+        ),
+        (
+            Constraints(topic="rag", year=rule(Comparison.EQUAL, 2020)),
+            "publication_year:2020",
+        ),
+        (
+            Constraints(
+                topic="rag",
+                year=rule(Comparison.LESS_THAN, 2021),
+                citations=rule(Comparison.ABOUT, 1000),
+            ),
+            "publication_year:<2021,cited_by_count:800-1200",
+        ),
+        (  # "recent" and "2022 or later" combine into one range: 2024 and up
+            Constraints(topic="rag", year=rule(Comparison.AT_LEAST, 2022), recent=True),
+            "publication_year:>2023",
+        ),
+    ],
+)
+def test_search_sends_rules_as_openalex_filter(
+    constraints: Constraints,
+    expected_filter: str | None,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    assert sent_filter(constraints, monkeypatch) == expected_filter
+
+
+def test_contradictory_rules_skip_the_search() -> None:
+    seen: list[httpx.Request] = []
+    constraints = Constraints(
+        topic="rag", year=rule(Comparison.LESS_THAN, 2015), recent=True
+    )
+
+    papers = search_openalex(constraints, CURRENT_YEAR, transport=fake_openalex(seen))
+
+    assert papers == []
+    assert seen == []  # no request was made

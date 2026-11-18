@@ -8,13 +8,13 @@ An AI agent, built with [PydanticAI](https://pydantic.dev/docs/ai/), that finds 
 
 Python code runs the steps in a fixed order. The LLM is used only where language understanding or judgement is needed. Anything that must be exact (calling the paper API, checking years and citation counts, copying facts into the answer) is plain, deterministic code. PydanticAI calls this pattern *programmatic agent hand-off*: application code decides what runs next.
 
-```
+```text
 user request
   │
   ├─ 1. LLM   Understand the request → Constraints (structured output)
   │           topic · year rule (before / after / in) · citation rule (at least / at most / about)
   │
-  ├─ 2. CODE  Search OpenAlex for the topic → candidate papers
+  ├─ 2. CODE  Search OpenAlex for the topic, with the year/citation rules as filters → candidates
   │
   ├─ 3. CODE  Filter candidates: keep, or reject with a reason (e.g. "published 2017, needs before 2015")
   │
@@ -26,7 +26,7 @@ user request
 ```
 
 | Step | Who | Why there |
-|---|---|---|
+| --- | --- | --- |
 | 1. Understand the request | LLM | Requests are free text ("recent", "highly cited", "before 2015"); turning them into rules needs language understanding. The output must fit a Pydantic `Constraints` model, so it's checked automatically. |
 | 2. Search for candidates | Code | Calling an API must be exact and repeatable. |
 | 3. Filter by year and citations | Code | Comparing numbers must be exact. An LLM can misread "after 2022" or misremember counts. |

@@ -64,3 +64,27 @@ class Verdict(BaseModel):
     @property
     def accepted(self) -> bool:
         return not self.reasons
+
+
+class AllowedRange(BaseModel):
+    """The whole numbers a rule allows, both ends included. None = no limit."""
+
+    low: int | None = None
+    high: int | None = None
+
+    def contains(self, number: int) -> bool:
+        above_low = self.low is None or number >= self.low
+        below_high = self.high is None or number <= self.high
+        return above_low and below_high
+
+    @property
+    def is_empty(self) -> bool:
+        """True if no number fits, e.g. low 2024 and high 2014."""
+        return self.low is not None and self.high is not None and self.low > self.high
+
+
+class ResolvedRule(BaseModel):
+    """A user's rule together with the exact range of numbers it allows."""
+
+    rule: NumberRule
+    allowed: AllowedRange

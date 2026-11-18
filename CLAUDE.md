@@ -52,13 +52,14 @@ Kept short: this file loads in every session.
 - **Git:** initialised, first commit made (code, `CLAUDE.md`, `.claude/`, `.vscode/`; not `docs/` or `.env`).
 - **Paper API chosen:** OpenAlex, optional `OPENALEX_API_KEY` (decision 6). Field mapping in `docs/NOTES.md`.
 - **`models.py`:** shared data models: `Paper`, `Constraints` (topic + optional year/citation `NumberRule`s + `recent` flag). Tests in `tests/test_models.py`.
+- **`rules.py`:** what each rule allows (`AllowedRange`), shared by filter and OpenAlex query.
 - **`filters.py`:** `filter_papers()` / `check_paper()` give a `Verdict` (reasons) per paper. Tests in `tests/test_filters.py`. 
-- **`agents.py`:** LLM step 1, `extract_constraints(request, model)` → `Constraints`. Tests in `tests/test_agents.py` with `FunctionModel`; `tests/conftest.py` blocks real LLM calls. 42 tests pass in total.
-- **`openalex.py`:** `paper_from_openalex()` and `search_openalex(topic)` (real HTTP call, 25 results, optional key). Tests in `tests/test_openalex.py` (9 pass, fake network via `httpx.MockTransport`).
+- **`agents.py`:** LLM step 1, `extract_constraints(request, model)` → `Constraints`. Tests in `tests/test_agents.py` with `FunctionModel`; `tests/conftest.py` blocks real LLM calls. 62 tests pass in total.
+- **`openalex.py`:** `paper_from_openalex()` and `search_openalex(constraints, current_year)` (topic + year/citation rules sent as OpenAlex filters, 25 results, optional key). Tests in `tests/test_openalex.py` (9 pass, fake network via `httpx.MockTransport`).
 - **Workflow designed (decisions 9–10):** code runs fixed steps (LLM reads request → code search → code filter → LLM judges relevance, with an optional `search_papers` tool → code builds answer). Described in `README.md` "How the agent works" (README has only that section so far).
 - **Model:** local Ollama `qwen2.5:7b-instruct` is final (decision 12); no cloud LLM planned.
 - **Not yet:** the search hooked into the agent, the relevance agent, wiring, evaluation, rest of README.
-- **Next:** Phase 2 "Pass the constraints to the API" in [docs/PLAN.md](docs/PLAN.md). Ollama must be running for real tries (the app, or `ollama serve`).
+- **Next:** Phase 3 "Full `PaperAnswer`" in [docs/PLAN.md](docs/PLAN.md). OpenAlex's keyless daily budget can run out: a free `OPENALEX_API_KEY` in `.env` avoids that. Ollama must be running for real tries (the app, or `ollama serve`).
 
 ## Working notes
 
