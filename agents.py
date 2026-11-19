@@ -6,7 +6,6 @@ models often answer in plain text when asked to use an output tool instead.
 """
 
 import textwrap
-from collections.abc import Callable
 from dataclasses import dataclass
 
 from pydantic_ai import Agent, ModelRetry, NativeOutput, RunContext
@@ -14,7 +13,7 @@ from pydantic_ai.models import Model
 from pydantic_ai.settings import ModelSettings
 
 from filters import filter_papers
-from models import Constraints, Paper, RelevanceJudgement, RelevanceOutcome
+from models import Constraints, Paper, RelevanceJudgement, RelevanceOutcome, Search
 from openalex import search_openalex
 
 OUTPUT_RETRIES = 3  # how often the LLM may retry an answer that doesn't fit the model
@@ -89,7 +88,7 @@ class RelevanceDeps:
     constraints: Constraints
     current_year: int
     candidates: list[Paper]  # grows when search_papers finds new papers
-    search: Callable[[Constraints, int], list[Paper]]  # tests pass a fake
+    search: Search  # tests pass a fake
     searches_used: int = 0
 
 
@@ -158,7 +157,7 @@ def judge_relevance(
     constraints: Constraints,
     current_year: int,
     model: Model | str,
-    search: Callable[[Constraints, int], list[Paper]] = search_openalex,
+    search: Search = search_openalex,
 ) -> RelevanceOutcome:
     """LLM step 4: pick the candidate that best fits the request, and explain why."""
     deps = RelevanceDeps(

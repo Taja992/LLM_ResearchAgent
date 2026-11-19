@@ -6,7 +6,6 @@ Uses the real model and live OpenAlex (one or two requests per case), so run it
 on purpose. Prints the results table and saves every answer to RESULTS_FILE.
 """
 
-from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
@@ -19,14 +18,13 @@ from pydantic_evals.reporting import EvaluationReport
 from evaluation_cases import EVALUATION_SET, Answer, CaseCriteria, RunResult
 from evaluation_checks import all_checks
 from main import configure
-from models import Constraints, Paper
+from models import Constraints, Paper, Search
 from openalex import search_openalex
 from workflow import find_paper
 
 RESULTS_FILE = Path("evaluation_results.json")
 ONE_CASE_AT_A_TIME = 1  # one local model can't usefully answer several at once
 
-type Search = Callable[[Constraints, int], list[Paper]]
 type Report = EvaluationReport[str, RunResult, CaseCriteria]
 
 

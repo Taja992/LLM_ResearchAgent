@@ -1,0 +1,7 @@
+# Dark theme for the web demo (app.py), to match the step graph. No purple.
+[theme]
+base = "dark"
+primaryColor = "#0284c7"
+backgroundColor = "#0e1013"
+secondaryBackgroundColor = "#16191e"
+textColor = "#e5e7eb"

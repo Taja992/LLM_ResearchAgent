@@ -3,6 +3,7 @@
 Each model says what the data looks like; other files decide where it comes from.
 """
 
+from collections.abc import Callable
 from enum import StrEnum
 from typing import Literal, Self
 
@@ -53,6 +54,9 @@ class Constraints(BaseModel):
         default=False, description="True if the user asked for a 'recent' paper."
     )
 
+
+# A paper search: constraints and the current year in, papers out (tests pass fakes).
+type Search = Callable[[Constraints, int], list[Paper]]
 
 RuleField = Literal["year", "citations"]  # the two numbers rules can check
 

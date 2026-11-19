@@ -4,7 +4,7 @@ An AI agent, built with [PydanticAI](https://pydantic.dev/docs/ai/), that finds 
 
 ## How the agent works
 
-Python code runs five steps in a fixed order; the LLM never decides what happens next. The LLM is used only where language understanding or judgement is needed. Anything that must be exact (calling the paper API, checking years and citation counts, copying facts into the answer) is plain, deterministic code. PydanticAI calls this pattern *programmatic agent hand-off*. The whole workflow is one short function, [`find_paper`](workflow.py), where each step is marked `# LLM` or `# CODE`.
+Python code runs five steps in a fixed order; the LLM never decides what happens next. The LLM is used only where language understanding or judgement is needed. Anything that must be exact (calling the paper API, checking years and citation counts, copying facts into the answer) is plain, deterministic code. PydanticAI calls this pattern *programmatic agent hand-off*. The whole workflow is one short function, [`paper_steps`](workflow.py), where each step is marked `# LLM` or `# CODE`; [`find_paper`](workflow.py) runs it from start to end.
 
 ```text
 user request
@@ -67,6 +67,10 @@ python main.py "Find a research paper about LLM agents for software engineering 
   "uncertainty": null
 }
 ```
+
+### Live demo page
+
+`streamlit run app.py` opens a small web page: type a request and watch each step light up as it runs (cyan = LLM, green = plain code), then see the answer. With "Pause between steps" on, it stops after each step until you click Continue, and you can pick any step to see its code, with the lines that run it highlighted. It runs the same workflow (`paper_steps`); the page only displays what it reports.
 
 ## Evaluation
 
