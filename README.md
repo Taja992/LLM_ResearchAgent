@@ -68,6 +68,10 @@ python main.py "Find a research paper about LLM agents for software engineering 
 }
 ```
 
+### Live demo page
+
+`streamlit run app.py` opens a small web page: type a request and watch each step light up as it runs (cyan = LLM, green = plain code), then see the answer. It uses the same `find_paper` workflow; the page only displays what it reports.
+
 ## Evaluation
 
 The agent was tested with 12 requests ([evaluation_cases.py](evaluation_cases.py)). They cover broad and narrow topics, before / after / exact years, minimum citations, unclear requests, and two requests where no good paper exists. Code checks the exact things: the year rule, the citation rule, a valid link and source, and that the paper's details match what OpenAlex returned ([evaluation_checks.py](evaluation_checks.py)). The first run passed 48 of 50 checks. After a fix (temperature 0), the second run passed 53 of 55 ([evaluation_results.json](evaluation_results.json)). Relevance and usefulness of the explanation were scored by hand for 10 of the requests: 19/20 for relevance and 15/20 for the explanation. The method, every answer and every score are in [documentation/SCORING.md](documentation/SCORING.md).

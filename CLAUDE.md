@@ -64,11 +64,12 @@ Kept short: this file loads in every session.
 - **`evaluation_cases.py`:** `EVALUATION_SET`, a `pydantic_evals` `Dataset` of 12 cases, each with hand-written `CaseCriteria` (decision 32). Output per run is `RunResult` (answer + papers the searches returned + search count). Tests in `tests/test_evaluation_cases.py`.
 - **`evaluation_checks.py`:** five `pydantic_evals` evaluators for the exact criteria (decision 33). Tests in `tests/test_evaluation_checks.py`.
 - **`evaluate.py`:** runs the evaluation for real (`.venv\Scripts\python evaluate.py`; uses live OpenAlex, run on purpose). Results in `evaluation_results.json` (run 2, 53/55 checks) and `evaluation_results_before_fixes.json` (run 1, 48/50). Both agents use temperature 0 (decision 34). **All graded code is done.**
-- **`progress.py` (branch `web`):** `find_paper(..., on_step=...)` announces each step started/finished for the web demo (decision 38). Tests in `tests/test_progress.py` and `tests/test_workflow.py`. 110 tests pass in total.
+- **`progress.py` (branch `web`):** `find_paper(..., on_step=...)` announces each step started/finished for the web demo (decision 38). Tests in `tests/test_progress.py` and `tests/test_workflow.py`.
+- **Web demo (branch `web`):** `app.py` (Streamlit page: `.venv\Scripts\streamlit run app.py`) + `pills.py` (step graph HTML/CSS, tested in `tests/test_pills.py`) + `step_code.py` (real code per step via `inspect`, decision 41) + `code_html.py` (Pygments highlighting; pick a step to light up its lines, decision 42), dark theme in `.streamlit/config.toml` (decision 39). Restart Streamlit after changing helper modules. 126 tests pass in total.
 - **Owner's scores:** in `documentation/SCORING.md` (drafted by Claude, reviewed and confirmed by the owner): 10 of the 12 cases scored (owner's choice): relevant 19/20, explanation 15/20.
 - **README:** "How the agent works" (final), Evaluation (short, links `documentation/SCORING.md`) and Reflection.
 - **Not yet:** README setup / install / API key / how to run / model choice (Phase 5), public repo, demo video. No code needed.
-- **Next:** WEBPLAN step 2, the Streamlit page ([docs/WEBPLAN.md](docs/WEBPLAN.md)), on branch `web`. Also still open: README setup sections and model choice (Phase 5), the demo video. Ollama must be running for real tries (the app, or `ollama serve`).
+- **Next:** README setup sections and model choice (Phase 5 in [docs/PLAN.md](docs/PLAN.md)), then the demo video. Web demo is done on branch `web` (merge into `main` when the owner wants). Ollama must be running for real tries (the app, or `ollama serve`).
 
 ## Working notes
 
