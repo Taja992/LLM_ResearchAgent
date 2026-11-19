@@ -1,7 +1,6 @@
 """Tests for agents.py, using FunctionModel: a fake LLM we script ourselves."""
 
 import json
-from collections.abc import Callable
 from typing import Any
 
 from pydantic_ai.messages import ModelMessage, ModelResponse, TextPart, ToolCallPart
@@ -13,7 +12,7 @@ from agents import (
     extract_constraints,
     judge_relevance,
 )
-from models import Comparison, Constraints, NumberRule, Paper, RelevanceOutcome
+from models import Comparison, Constraints, NumberRule, Paper, RelevanceOutcome, Search
 
 REQUEST = "a paper about RAG published before 2021 with more than 500 citations"
 GOOD_ANSWER: dict[str, Any] = {
@@ -111,7 +110,7 @@ def no_search(constraints: Constraints, current_year: int) -> list[Paper]:
 def judge(
     candidates: list[Paper],
     replies: list[Reply],
-    search: Callable[[Constraints, int], list[Paper]] = no_search,
+    search: Search = no_search,
     prompts: list[str] | None = None,
 ) -> RelevanceOutcome:
     """Run judge_relevance with a fake LLM that gives `replies` in order."""

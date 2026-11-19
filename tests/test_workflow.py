@@ -8,7 +8,7 @@ from pydantic_ai.models.function import AgentInfo, FunctionModel
 
 from models import Constraints, NoMatch, Paper, PaperAnswer
 from progress import StepName, StepReporter, StepStatus
-from workflow import find_paper
+from workflow import find_paper, paper_steps, run_to_end
 
 CURRENT_YEAR = 2026
 REQUEST = "a paper about RAG published before 2021"
@@ -143,3 +143,26 @@ def test_an_extra_search_is_announced_inside_picking() -> None:
         (StepName.EXTRA_SEARCH, StepStatus.FINISHED),
         (StepName.PICK_PAPER, StepStatus.FINISHED),
     ]
+
+
+def test_paper_steps_pauses_after_each_step_until_asked_to_go_on() -> None:
+    replies: list[dict[str, Any]] = [
+        CONSTRAINTS_REPLY,
+        {"paper_number": 1, "explanation": "It introduces RAG."},
+    ]
+    prompts: list[str] = []
+    steps = paper_steps(
+        REQUEST, scripted_llm(replies, prompts), CURRENT_YEAR, fake_search
+    )
+
+    assert next(steps) is StepName.READ_REQUEST
+    assert len(prompts) == 1  # paused: step 4's LLM call has not happened yet
+    assert [next(steps), next(steps), next(steps)] == [
+        StepName.SEARCH,
+        StepName.CHECK_RULES,
+        StepName.PICK_PAPER,
+    ]
+    answer = run_to_end(steps)  # step 5 builds the answer
+
+    assert isinstance(answer, PaperAnswer)
+    assert answer.title == OLD_PAPER.title

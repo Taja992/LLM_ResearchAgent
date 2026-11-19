@@ -9,22 +9,21 @@ features Chrome and Firefox both support.
 from dataclasses import dataclass, field
 from enum import StrEnum
 from html import escape
+from typing import Literal
 
 from progress import STEPS, Step, StepName, StepStatus
 from step_code import step_code
 
 
-class PillState(StrEnum):
+class NodeState(StrEnum):
+    """A step's state; the value is also its label and CSS class."""
+
     WAITING = "waiting"
     RUNNING = "running"
     DONE = "done"
 
 
-STATE_LABELS = {
-    PillState.WAITING: "waiting",
-    PillState.RUNNING: "running",
-    PillState.DONE: "done",
-}
+type WireState = NodeState | Literal["paused"]  # a wire can also show a pause
 DONE_MARK = "&#10003; "  # a tick, written so any text encoding shows it
 OPTIONAL_STEPS = {StepName.EXTRA_SEARCH}  # only shown once it actually happens
 BREAK_AFTER = ("_", ".", "(")  # long calls wrap here, never mid-word
@@ -90,6 +89,12 @@ STYLE = """
 
 .wire { position: relative; flex: 0 0 40px; height: 2px; align-self: center; background: #2f343e; }
 .wire.done { background: var(--c); }
+.wire.paused { background: repeating-linear-gradient(90deg, #f8fafc 0 4px, transparent 4px 9px); }
+.wire.paused::after {
+  content: "‖"; position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+  padding: 0 6px; border: 1px solid #f8fafc; border-radius: 999px; background: #0b0d10;
+  color: #f8fafc; font-size: 11px; line-height: 18px; animation: blink 1.2s ease-in-out infinite;
+}
 .wire.running {
   background: repeating-linear-gradient(90deg, var(--c) 0 6px, transparent 6px 14px);
   animation: flow 0.7s linear infinite;
@@ -104,6 +109,7 @@ STYLE = """
   0%, 100% { box-shadow: 0 0 0 0 transparent; }
   50% { box-shadow: 0 0 18px 1px var(--c); }
 }
+@keyframes blink { 50% { opacity: 0.35; } }
 @keyframes flow { from { background-position: 0 0; } to { background-position: 14px 0; } }
 @keyframes travel {
   from { transform: translateX(-4px); opacity: 0; }
@@ -111,7 +117,7 @@ STYLE = """
   to { transform: translateX(36px); opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .node.running, .wire.running, .wire.running::after { animation: none; }
+  .node.running, .wire.running, .wire.running::after, .wire.paused::after { animation: none; }
 }
 </style>
 """
@@ -121,43 +127,60 @@ STYLE = """
 class StepBoard:
     """Remembers the state of every step while the agent runs."""
 
-    states: dict[StepName, PillState] = field(
-        default_factory=lambda: {step.name: PillState.WAITING for step in STEPS}
+    states: dict[StepName, NodeState] = field(
+        default_factory=lambda: {step.name: NodeState.WAITING for step in STEPS}
     )
 
     def update(self, step: StepName, status: StepStatus) -> None:
         """Fits progress.StepReporter, so it can be passed as `on_step`."""
         started = status is StepStatus.STARTED
-        self.states[step] = PillState.RUNNING if started else PillState.DONE
+        self.states[step] = NodeState.RUNNING if started else NodeState.DONE
 
-    def html(self, selected: StepName | None = None) -> str:
+    def next_step(self) -> Step | None:
+        """The first main step that has not started yet, or None when all have."""
+        return next(
+            (
+                step
+                for step in STEPS
+                if step.name not in OPTIONAL_STEPS
+                and self.states[step.name] is NodeState.WAITING
+            ),
+            None,
+        )
+
+    def html(self, selected: StepName | None = None, paused: bool = False) -> str:
         """All visible steps in order, each wire taking the next step's state.
 
         The `selected` step gets a ring, so you can see which code is shown.
+        When `paused`, the wire into the next step shows a pause mark.
         """
+        waiting_for = self.next_step() if paused else None
         visible = [
             step
             for step in STEPS
             if step.name not in OPTIONAL_STEPS
             or step.name == selected
-            or self.states[step.name] is not PillState.WAITING
+            or self.states[step.name] is not NodeState.WAITING
         ]
         nodes = [_node(step, self.states[step.name], selected) for step in visible]
         parts = [nodes[0]]
         for step, node in zip(visible[1:], nodes[1:], strict=True):
-            parts += [_wire(step, self.states[step.name]), node]
+            wire_state: WireState = (
+                "paused" if step == waiting_for else self.states[step.name]
+            )
+            parts += [_wire(step, wire_state), node]
         graph = "".join(parts)
         return f'{STYLE}<div class="canvas"><div class="graph">{graph}</div></div>'
 
 
-def _node(step: Step, state: PillState, selected: StepName | None) -> str:
-    mark = DONE_MARK if state is PillState.DONE else ""
+def _node(step: Step, state: NodeState, selected: StepName | None) -> str:
+    mark = DONE_MARK if state is NodeState.DONE else ""
     ring = " selected" if step.name == selected else ""
     return (
         f'<div class="node {step.done_by.lower()} {state}{ring}">'
         '<span class="port in"></span><span class="port out"></span>'
         f'<div class="head"><span>{step.done_by}</span>'
-        f'<span class="state">{STATE_LABELS[state]}</span></div>'
+        f'<span class="state">{state}</span></div>'
         f'<div class="name">{mark}{escape(step.title)}</div>'
         f'<div class="desc">{escape(step.description)}</div>'
         f'<div class="call">{_breakable(step_code(step.name).call)}</div>'
@@ -165,7 +188,7 @@ def _node(step: Step, state: PillState, selected: StepName | None) -> str:
     )
 
 
-def _wire(into: Step, state: PillState) -> str:
+def _wire(into: Step, state: WireState) -> str:
     """A wire runs when the step it leads into runs, and is lit once that is done."""
     return f'<div class="wire {into.done_by.lower()} {state}"></div>'
 

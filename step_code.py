@@ -17,9 +17,9 @@ from filters import filter_papers
 from models import PaperAnswer
 from openalex import search_openalex
 from progress import StepName
-from workflow import find_paper
+from workflow import paper_steps
 
-# The function that does the work of each step (tests check find_paper calls it).
+# The function that does the work of each step (tests check paper_steps calls it).
 STEP_FUNCTIONS: dict[StepName, Callable[..., Any]] = {
     StepName.READ_REQUEST: extract_constraints,
     StepName.SEARCH: search_openalex,
@@ -53,7 +53,7 @@ def step_code(step: StepName) -> CodeView:
     return code_of(STEP_FUNCTIONS[step])
 
 
-# How each step's line is found in find_paper: the `with reported(...)` line names
+# How each step's line is found in paper_steps: the `with reported(...)` line names
 # the step. The extra search is started from inside step 4, on this line.
 WORKFLOW_MARKERS = {step: f"StepName.{step.name}" for step in StepName} | {
     StepName.EXTRA_SEARCH: "_reported_extra_search("
@@ -61,11 +61,11 @@ WORKFLOW_MARKERS = {step: f"StepName.{step.name}" for step in StepName} | {
 
 
 def workflow_lines(step: StepName) -> list[int]:
-    """Lines of find_paper (1 = its first line) that run this step.
+    """Lines of paper_steps (1 = its first line) that run this step.
 
     The line that names the step, plus the indented block under it.
     """
-    lines = code_of(find_paper).source.splitlines()
+    lines = code_of(paper_steps).source.splitlines()
     start = next(i for i, line in enumerate(lines) if WORKFLOW_MARKERS[step] in line)
     end = start + 1
     while end < len(lines) and _indent(lines[end]) > _indent(lines[start]):

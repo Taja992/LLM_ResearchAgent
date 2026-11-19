@@ -18,9 +18,9 @@ from pydantic_evals.reporting import EvaluationReport
 from evaluation_cases import EVALUATION_SET, Answer, CaseCriteria, RunResult
 from evaluation_checks import all_checks
 from main import configure
-from models import Constraints, Paper
+from models import Constraints, Paper, Search
 from openalex import search_openalex
-from workflow import Search, find_paper
+from workflow import find_paper
 
 RESULTS_FILE = Path("evaluation_results.json")
 ONE_CASE_AT_A_TIME = 1  # one local model can't usefully answer several at once

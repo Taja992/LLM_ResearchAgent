@@ -50,7 +50,7 @@ uvx ruff check --fix .                 # lint + auto-fix
 
 Kept short: this file loads in every session.
 
-- **Exists:** the full agent runs end to end: `main.py` (command line) → `workflow.find_paper()` (five steps in order) → `PaperAnswer` or `NoMatch`. Local Ollama `qwen2.5:7b-instruct`; any model swaps in via `MODEL` in `.env`. `requirements.txt` (pydantic-ai-slim 2.68, pydantic-evals 2.68, httpx, python-dotenv, pytest). A `.venv` made by `uv` with Python 3.12.
+- **Exists:** the full agent runs end to end: `main.py` (command line) → `workflow.find_paper()` (runs the generator `paper_steps()`, five steps in order, decision 43) → `PaperAnswer` or `NoMatch`. Local Ollama `qwen2.5:7b-instruct`; any model swaps in via `MODEL` in `.env`. `requirements.txt` (pydantic-ai-slim 2.68, pydantic-evals 2.68, httpx, python-dotenv, pytest). A `.venv` made by `uv` with Python 3.12.
 - **Git:** initialised, first commit made (code, `CLAUDE.md`, `.claude/`, `.vscode/`; not `docs/` or `.env`).
 - **Paper API chosen:** OpenAlex, optional `OPENALEX_API_KEY` (decision 6). Field mapping in `docs/NOTES.md`.
 - **`models.py`:** shared data models: `Paper`, `Constraints` (topic + optional year/citation `NumberRule`s + `recent` flag), `Verdict`, `AllowedRange`, `PaperAnswer` (`from_paper()` copies facts; LLM gives explanation + uncertainty). Tests in `tests/test_models.py`.
@@ -65,7 +65,7 @@ Kept short: this file loads in every session.
 - **`evaluation_checks.py`:** five `pydantic_evals` evaluators for the exact criteria (decision 33). Tests in `tests/test_evaluation_checks.py`.
 - **`evaluate.py`:** runs the evaluation for real (`.venv\Scripts\python evaluate.py`; uses live OpenAlex, run on purpose). Results in `evaluation_results.json` (run 2, 53/55 checks) and `evaluation_results_before_fixes.json` (run 1, 48/50). Both agents use temperature 0 (decision 34). **All graded code is done.**
 - **`progress.py` (branch `web`):** `find_paper(..., on_step=...)` announces each step started/finished for the web demo (decision 38). Tests in `tests/test_progress.py` and `tests/test_workflow.py`.
-- **Web demo (branch `web`):** `app.py` (Streamlit page: `.venv\Scripts\streamlit run app.py`) + `pills.py` (step graph HTML/CSS, tested in `tests/test_pills.py`) + `step_code.py` (real code per step via `inspect`, decision 41) + `code_html.py` (Pygments highlighting; pick a step to light up its lines, decision 42), dark theme in `.streamlit/config.toml` (decision 39). Restart Streamlit after changing helper modules. 126 tests pass in total.
+- **Web demo (branch `web`):** `app.py` (Streamlit page: `.venv\Scripts\streamlit run app.py`) + `step_graph.py` (step graph HTML/CSS, tested in `tests/test_step_graph.py`) + `step_code.py` (real code per step via `inspect`, decision 41) + `code_html.py` (Pygments highlighting; pick a step to light up its lines, decision 42) + `demo_run.py` (pause between steps, decision 43), dark theme in `.streamlit/config.toml` (decision 39). Restart Streamlit after changing helper modules. 133 tests pass in total.
 - **Owner's scores:** in `documentation/SCORING.md` (drafted by Claude, reviewed and confirmed by the owner): 10 of the 12 cases scored (owner's choice): relevant 19/20, explanation 15/20.
 - **README:** "How the agent works" (final), Evaluation (short, links `documentation/SCORING.md`) and Reflection.
 - **Not yet:** README setup / install / API key / how to run / model choice (Phase 5), public repo, demo video. No code needed.

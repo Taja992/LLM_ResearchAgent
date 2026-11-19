@@ -5,7 +5,7 @@ import re
 
 from progress import StepName
 from step_code import STEP_FUNCTIONS, code_of, step_code, workflow_lines
-from workflow import find_paper
+from workflow import paper_steps
 
 
 def test_every_step_has_real_code() -> None:
@@ -23,7 +23,7 @@ def test_the_call_line_shows_the_function_and_its_parameters() -> None:
 
 
 def test_each_linked_function_is_really_called_by_the_workflow() -> None:
-    workflow = inspect.getsource(find_paper)
+    workflow = inspect.getsource(paper_steps)
     for function in STEP_FUNCTIONS.values():
         assert function.__name__ in workflow  # the link can't go stale quietly
 
@@ -36,7 +36,7 @@ def test_method_code_is_dedented() -> None:
 
 
 def test_workflow_lines_cover_the_step_and_its_block() -> None:
-    lines = code_of(find_paper).source.splitlines()
+    lines = code_of(paper_steps).source.splitlines()
 
     picked = [lines[n - 1] for n in workflow_lines(StepName.PICK_PAPER)]
 
