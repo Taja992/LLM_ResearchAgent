@@ -6,6 +6,7 @@ A course assignment: an AI agent, built with **PydanticAI**, that searches for r
 - Roadmap with checkboxes: [docs/PLAN.md](docs/PLAN.md)
 - Why things are the way they are: [docs/DECISIONS.md](docs/DECISIONS.md)
 - How each part works (the owner's own reference): [docs/NOTES.md](docs/NOTES.md)
+- Optional web demo for the video: [docs/WEBPLAN.md](docs/WEBPLAN.md)
 
 ## How we work (most important)
 
