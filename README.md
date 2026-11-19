@@ -2,6 +2,66 @@
 
 An AI agent, built with [PydanticAI](https://pydantic.dev/docs/ai/), that finds a research paper matching a request such as *"a paper on graph neural networks from before 2015 with at least 1000 citations"*, checks it against the constraints, and explains why it fits.
 
+## Setup
+
+**You need:** [Python 3.12+](https://www.python.org/downloads/), [Git](https://git-scm.com/) and [Ollama](https://ollama.com/download) (runs the LLM on your own computer, free).
+
+### 1. Get the code and install the dependencies
+
+```bash
+git clone https://github.com/Taja992/LLM_ResearchAgent.git
+cd LLM_ResearchAgent
+python -m venv .venv
+.venv\Scripts\activate          # Windows
+source .venv/bin/activate       # macOS / Linux
+pip install -r requirements.txt
+```
+
+### 2. Settings and API key (optional)
+
+The agent runs without any settings: it then uses the default model (`qwen2.5:7b-instruct`) and searches OpenAlex without an API key. To change either, copy the example settings file to `.env`:
+
+```bash
+copy .env.example .env          # Windows
+cp .env.example .env            # macOS / Linux
+```
+
+`.env` holds two settings: which model to use (`MODEL`, see step 3) and your OpenAlex API key. It is git-ignored, so it never ends up in the repository.
+
+**OpenAlex API key (optional, recommended):** without a key, the agent works, but keyless requests share a small free daily budget, and many runs in one day can use it up. A free key from [openalex.org/settings/api](https://openalex.org/settings/api) avoids that: put it on the `OPENALEX_API_KEY=` line in `.env` (remove the `#` in front).
+
+### 3. Choose and download a model
+
+Any Ollama model can be used: the agent reads the model name from `MODEL` in `.env` (step 2), written as `ollama:<model name>`. The default, and the model everything in this README was tested with, is `qwen2.5:7b-instruct`:
+
+```env
+MODEL=ollama:qwen2.5:7b-instruct
+```
+
+Download the model once (Ollama must be running: start the Ollama app, or run `ollama serve`). For the default model, about 4.7 GB:
+
+```bash
+ollama pull qwen2.5:7b-instruct
+```
+
+To use another model, pull it and change the `MODEL` line, for example `ollama pull llama3.1:8b` and `MODEL=ollama:llama3.1:8b`. The model must be able to answer in JSON (structured output). Smaller models are less reliable: in testing, `qwen3:4b-instruct` read only 3 of 5 example requests correctly, against 5 of 5 for `qwen2.5:7b-instruct`. Cloud models from other providers also work; `.env.example` lists them.
+
+## How to run
+
+With the virtual environment active and Ollama running:
+
+```bash
+python main.py "Find a paper about retrieval-augmented generation published before 2021 with more than 500 citations"
+```
+
+The answer is printed as JSON (see the [example](#example) below). A run takes about 5 to 20 seconds; the first one is slower while the model loads.
+
+**Web page:** `streamlit run app.py` opens a page in the browser that shows each step live (see [Live demo page](#live-demo-page)).
+
+**Tests:** `python -m pytest` (they use a fake LLM and fake search data, so they need neither Ollama nor OpenAlex).
+
+**Model choice:** `qwen2.5:7b-instruct` was chosen because it is free, runs locally with no rate limits, and handles structured output well with PydanticAI's `NativeOutput`. Its weaknesses are listed in the [reflection](#reflection). To use a different model, see [step 3](#3-choose-and-download-a-model).
+
 ## How the agent works
 
 Python code runs five steps in a fixed order; the LLM never decides what happens next. The LLM is used only where language understanding or judgement is needed. Anything that must be exact (calling the paper API, checking years and citation counts, copying facts into the answer) is plain, deterministic code. PydanticAI calls this pattern *programmatic agent hand-off*. The whole workflow is one short function, [`paper_steps`](workflow.py), where each step is marked `# LLM` or `# CODE`; [`find_paper`](workflow.py) runs it from start to end.

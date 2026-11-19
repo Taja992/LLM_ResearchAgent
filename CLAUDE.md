@@ -67,9 +67,9 @@ Kept short: this file loads in every session.
 - **`progress.py` (branch `web`):** `find_paper(..., on_step=...)` announces each step started/finished for the web demo (decision 38). Tests in `tests/test_progress.py` and `tests/test_workflow.py`.
 - **Web demo (branch `web`):** `app.py` (Streamlit page: `.venv\Scripts\streamlit run app.py`) + `step_graph.py` (step graph HTML/CSS, tested in `tests/test_step_graph.py`) + `step_code.py` (real code per step via `inspect`, decision 41) + `code_html.py` (Pygments highlighting; pick a step to light up its lines, decision 42) + `demo_run.py` (pause between steps, decision 43), dark theme in `.streamlit/config.toml` (decision 39). Restart Streamlit after changing helper modules. 133 tests pass in total.
 - **Owner's scores:** in `documentation/SCORING.md` (drafted by Claude, reviewed and confirmed by the owner): 10 of the 12 cases scored (owner's choice): relevant 19/20, explanation 15/20.
-- **README:** "How the agent works" (final), Evaluation (short, links `documentation/SCORING.md`) and Reflection.
-- **Not yet:** README setup / install / API key / how to run / model choice (Phase 5), public repo, demo video. No code needed.
-- **Next:** README setup sections and model choice (Phase 5 in [docs/PLAN.md](docs/PLAN.md)), then the demo video. Web demo is done on branch `web` (merge into `main` when the owner wants). Ollama must be running for real tries (the app, or `ollama serve`).
+- **README:** Setup, How to run (incl. model choice), "How the agent works", Evaluation (links `documentation/SCORING.md`), Reflection. No contributions section (owner's choice).
+- **Not yet:** merge `web` into `main`, record the demo video (script in `docs/SCRIPT.md`).
+- **Next:** owner commits/pushes `web`, merges into `main`, makes sure the GitHub repo is public, then records the video ([docs/SCRIPT.md](docs/SCRIPT.md)). Ollama must be running for real tries.
 
 ## Working notes
 
