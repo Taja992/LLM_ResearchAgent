@@ -59,17 +59,18 @@ Kept short: this file loads in every session.
 - **`openalex.py`:** `paper_from_openalex()` and `search_openalex(constraints, current_year)` (topic + year/citation rules sent as OpenAlex filters, 25 results, optional key). Tests in `tests/test_openalex.py` (9 pass, fake network via `httpx.MockTransport`).
 - **Workflow designed (decisions 9–10):** code runs fixed steps (LLM reads request → code search → code filter → LLM judges relevance, with an optional `search_papers` tool → code builds answer). Described in `README.md` "How the agent works" (README has only that section so far).
 - **Model:** local Ollama `qwen2.5:7b-instruct` is final (decision 12); no cloud LLM planned.
-- **README:** "How the agent works" is final (workflow, code locations, checks, example). Setup/run/evaluation/reflection sections still to come.
 - **Evaluation method chosen (decision 31):** code checks the exact criteria, the owner scores relevance/usefulness with a 0–2 rubric. The research with sources is at the bottom of `docs/NOTES.md`, not in the README (owner's choice).
 - **`evaluation_cases.py`:** `EVALUATION_SET`, a `pydantic_evals` `Dataset` of 12 cases, each with hand-written `CaseCriteria` (decision 32). Output per run is `RunResult` (answer + papers the searches returned + search count). Tests in `tests/test_evaluation_cases.py`.
 - **`evaluation_checks.py`:** five `pydantic_evals` evaluators for the exact criteria (decision 33). Tests in `tests/test_evaluation_checks.py`.
 - **`evaluate.py`:** runs the evaluation for real (`.venv\Scripts\python evaluate.py`; uses live OpenAlex, run on purpose). Results in `evaluation_results.json` (run 2, 53/55 checks) and `evaluation_results_before_fixes.json` (run 1, 48/50). Both agents use temperature 0 (decision 34). 106 tests pass in total. **All code is done.**
-- **Not yet:** owner's rubric scores, results table in the README (Phase 4), rest of README (Phase 5). No code needed.
-- **Next:** Phase 4 "Judged checks" (write the 0–2 rubric; owner scores the 12 answers in `evaluation_results.json`), then "Record results" in the README in [docs/PLAN.md](docs/PLAN.md). Ollama must be running for real tries (the app, or `ollama serve`).
+- **Owner's scores:** in `documentation/SCORING.md` (drafted by Claude, reviewed and confirmed by the owner): 10 of the 12 cases scored (owner's choice): relevant 19/20, explanation 15/20.
+- **README:** "How the agent works" (final), Evaluation (short, links `documentation/SCORING.md`) and Reflection.
+- **Not yet:** README setup / install / API key / how to run / model choice (Phase 5), public repo, demo video. No code needed.
+- **Next:** README setup sections and model choice (Phase 5 in [docs/PLAN.md](docs/PLAN.md)), then the repo and the demo video. Ollama must be running for real tries (the app, or `ollama serve`).
 
 ## Working notes
 
-- **`docs/` is private** (git-ignored, this machine only). Anything graded (workflow write-up, eval set and results, reflection) goes in committed files like `README.md`, never only in `docs/`. Graded files (README etc.) must not link into `docs/`; `CLAUDE.md` and `.claude/` are committed and may.
+- **`docs/` is private** (git-ignored, this machine only). **`documentation/` is public** (committed): graded extras like `SCORING.md` go there. Anything graded (workflow write-up, eval set and results, reflection) goes in committed files like `README.md`, never only in `docs/`. Graded files (README etc.) must not link into `docs/`; `CLAUDE.md` and `.claude/` are committed and may.
 - **Live OpenAlex requests are rationed** (the daily budget is small). At most one or two per step, and only when the step really needs real data. Send them through the project's own code (`search_openalex` after `load_dotenv()`), so the owner's `OPENALEX_API_KEY` is used; never raw `curl`, which goes without the key. pytest never calls OpenAlex. Prefer the docs or the saved sample data.
 - Windows 11. The `.venv` has no `pip`: use `uv pip ...`.
 - pytest exit code 5 means "no tests found". That's fine before tests exist.
