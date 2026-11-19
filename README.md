@@ -2,7 +2,8 @@
 
 An AI agent, built with [PydanticAI](https://pydantic.dev/docs/ai/), that finds a research paper matching a request such as *"a paper on graph neural networks from before 2015 with at least 1000 citations"*, checks it against the constraints, and explains why it fits.
 
-## Setup
+<details>
+<summary><h2>Setup</h2></summary>
 
 **You need:** [Python 3.12+](https://www.python.org/downloads/), [Git](https://git-scm.com/) and [Ollama](https://ollama.com/download) (runs the LLM on your own computer, free).
 
@@ -48,7 +49,10 @@ To use another model, pull it and change the `MODEL` line, for example `ollama p
 
 Cloud models (OpenRouter, Groq, Google, Anthropic, OpenAI) can be set up the same way, with their API key in `.env` (Groq and Google first need `pip install "pydantic-ai-slim[groq]"` or `[google]`). They have not been tested with this agent.
 
-## How to run
+</details>
+
+<details>
+<summary><h2>How to run</h2></summary>
 
 With the virtual environment active and Ollama running:
 
@@ -56,15 +60,18 @@ With the virtual environment active and Ollama running:
 python main.py "Find a paper about retrieval-augmented generation published before 2021 with more than 500 citations"
 ```
 
-The answer is printed as JSON (see the [example](#example) below). A run takes about 5 to 20 seconds; the first one is slower while the model loads.
+The answer is printed as JSON (see *Example* under How the agent works). A run takes about 5 to 20 seconds; the first one is slower while the model loads.
 
-**Web page:** `streamlit run app.py` opens a page in the browser that shows each step live (see [Live demo page](#live-demo-page)).
+**Web page:** `streamlit run app.py` opens a page in the browser that shows each step live (see *Live demo page* under How the agent works).
 
 **Tests:** `python -m pytest` (they use a fake LLM and fake search data, so they need neither Ollama nor OpenAlex).
 
-**Model choice:** `qwen2.5:7b-instruct` was chosen because it is free, runs locally with no rate limits, and handles structured output well with PydanticAI's `NativeOutput`. Its weaknesses are listed in the [reflection](#reflection). To use a different model, see [step 3](#3-choose-and-download-a-model).
+**Model choice:** `qwen2.5:7b-instruct` was chosen because it is free, runs locally with no rate limits, and handles structured output well with PydanticAI's `NativeOutput`. Its weaknesses are listed in the Reflection. To use a different model, see Setup, step 3.
 
-## How the agent works
+</details>
+
+<details>
+<summary><h2>How the agent works</h2></summary>
 
 Python code runs five steps in a fixed order; the LLM never decides what happens next. The LLM is used only where language understanding or judgement is needed. Anything that must be exact (calling the paper API, checking years and citation counts, copying facts into the answer) is plain, deterministic code. PydanticAI calls this pattern *programmatic agent hand-off*. The whole workflow is one short function, [`paper_steps`](workflow.py), where each step is marked `# LLM` or `# CODE`; [`find_paper`](workflow.py) runs it from start to end.
 
@@ -134,13 +141,19 @@ python main.py "Find a research paper about LLM agents for software engineering 
 
 `streamlit run app.py` opens a small web page: type a request and watch each step light up as it runs (cyan = LLM, green = plain code), then see the answer. With "Pause between steps" on, it stops after each step until you click Continue, and you can pick any step to see its code, with the lines that run it highlighted. It runs the same workflow (`paper_steps`); the page only displays what it reports.
 
-## Evaluation
+</details>
+
+<details>
+<summary><h2>Evaluation</h2></summary>
 
 The agent was tested with 12 requests ([evaluation_cases.py](evaluation_cases.py)). They cover broad and narrow topics, before / after / exact years, minimum citations, unclear requests, and two requests where no good paper exists. Code checks the exact things: the year rule, the citation rule, a valid link and source, and that the paper's details match what OpenAlex returned ([evaluation_checks.py](evaluation_checks.py)). The first run passed 48 of 50 checks. After a fix (temperature 0), the second run passed 53 of 55 ([evaluation_results.json](evaluation_results.json)). Relevance and usefulness of the explanation were scored by hand for 10 of the requests: 19/20 for relevance and 15/20 for the explanation. The method, every answer and every score are in [documentation/SCORING.md](documentation/SCORING.md).
 
 Run it yourself with `python evaluate.py` (it uses the real model and OpenAlex).
 
-## Reflection
+</details>
+
+<details>
+<summary><h2>Reflection</h2></summary>
 
 ### What worked well?
 
@@ -165,3 +178,5 @@ Both LLM steps must answer in a fixed Pydantic shape; if the answer does not fit
 ### What would you improve with more time?
 
 I would try a larger model, which should read rules more reliably and follow length instructions. I would let code double-check the rules the LLM reads, for example by noticing a year in the request that is missing from the rules. I would give the LLM longer abstracts so it can write fuller summaries. I would make the explanation check smarter, so it also catches wrong words like "before" instead of "after", not only wrong numbers. Finally, I would run each test several times, to measure how often the agent is right and not just whether it was right once.
+
+</details>
