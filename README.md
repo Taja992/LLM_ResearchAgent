@@ -44,7 +44,9 @@ Download the model once (Ollama must be running: start the Ollama app, or run `o
 ollama pull qwen2.5:7b-instruct
 ```
 
-To use another model, pull it and change the `MODEL` line, for example `ollama pull llama3.1:8b` and `MODEL=ollama:llama3.1:8b`. The model must be able to answer in JSON (structured output). Smaller models are less reliable: in testing, `qwen3:4b-instruct` read only 3 of 5 example requests correctly, against 5 of 5 for `qwen2.5:7b-instruct`. Cloud models from other providers also work; `.env.example` lists them.
+To use another model, pull it and change the `MODEL` line, for example `ollama pull llama3.1:8b` and `MODEL=ollama:llama3.1:8b`. The model must be able to answer in JSON (structured output). Smaller models are less reliable: in testing, `qwen3:4b-instruct` read only 3 of 5 example requests correctly, against 5 of 5 for `qwen2.5:7b-instruct`. 
+
+Cloud models (OpenRouter, Groq, Google, Anthropic, OpenAI) can be set up the same way, with their API key in `.env` (Groq and Google first need `pip install "pydantic-ai-slim[groq]"` or `[google]`). They have not been tested with this agent.
 
 ## How to run
 
