@@ -2,6 +2,7 @@
 
 Two steps use the LLM (understanding and judging text); three are plain code
 (searching, checking numbers, copying facts). See README "How the agent works".
+Each step is announced to `on_step` as it starts and finishes (for a live display).
 """
 
 from collections.abc import Callable
@@ -12,28 +13,52 @@ from agents import extract_constraints, judge_relevance
 from filters import filter_papers, summarize_rejections
 from models import Constraints, NoMatch, Paper, PaperAnswer
 from openalex import search_openalex
+from progress import StepName, StepReporter, ignore_progress, reported
+
+type Search = Callable[[Constraints, int], list[Paper]]
 
 
 def find_paper(
     request: str,
     model: Model | str,
     current_year: int,
-    search: Callable[[Constraints, int], list[Paper]] = search_openalex,
+    search: Search = search_openalex,
+    on_step: StepReporter = ignore_progress,
 ) -> PaperAnswer | NoMatch:
     """Find one paper that fits the request, or explain why none does."""
-    constraints = extract_constraints(request, model)  # 1. LLM: read the request
-    found = search(constraints, current_year)  # 2. CODE: search OpenAlex
-    verdicts = filter_papers(found, constraints, current_year)  # 3. CODE: check rules
-    accepted = [verdict.paper for verdict in verdicts if verdict.accepted]
-    outcome = judge_relevance(  # 4. LLM: pick the best fit (may search once more)
-        request, accepted, constraints, current_year, model, search
-    )
-    if outcome.paper is None:  # CODE: counts why papers failed; LLM: why none fit
-        return NoMatch(
-            papers_checked=len(found),
-            rejections=summarize_rejections(verdicts),
-            explanation=outcome.explanation,
+    with reported(on_step, StepName.READ_REQUEST):  # 1. LLM: read the request
+        constraints = extract_constraints(request, model)
+    with reported(on_step, StepName.SEARCH):  # 2. CODE: search OpenAlex
+        found = search(constraints, current_year)
+    with reported(on_step, StepName.CHECK_RULES):  # 3. CODE: check the rules
+        verdicts = filter_papers(found, constraints, current_year)
+        accepted = [verdict.paper for verdict in verdicts if verdict.accepted]
+    with reported(on_step, StepName.PICK_PAPER):  # 4. LLM: pick (may search again)
+        outcome = judge_relevance(
+            request,
+            accepted,
+            constraints,
+            current_year,
+            model,
+            _reported_extra_search(search, on_step),
         )
-    return PaperAnswer.from_paper(  # 5. CODE: facts from the paper, words from the LLM
-        outcome.paper, outcome.explanation, outcome.uncertainty
-    )
+    with reported(on_step, StepName.BUILD_ANSWER):  # 5. CODE: build the answer
+        if outcome.paper is None:  # code counts why papers failed; LLM says why
+            return NoMatch(
+                papers_checked=len(found),
+                rejections=summarize_rejections(verdicts),
+                explanation=outcome.explanation,
+            )
+        return PaperAnswer.from_paper(  # facts from the paper, words from the LLM
+            outcome.paper, outcome.explanation, outcome.uncertainty
+        )
+
+
+def _reported_extra_search(search: Search, on_step: StepReporter) -> Search:
+    """The same search, announced as "Extra search" (step 4 only searches again)."""
+
+    def extra_search(constraints: Constraints, current_year: int) -> list[Paper]:
+        with reported(on_step, StepName.EXTRA_SEARCH):
+            return search(constraints, current_year)
+
+    return extra_search
