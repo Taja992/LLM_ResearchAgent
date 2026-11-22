@@ -5,19 +5,22 @@ No Streamlit here, so it can be tested without a browser.
 """
 
 from collections.abc import Iterable
+from typing import ClassVar
 
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import PythonLexer
 from pygments.styles.gh_dark import GhDarkStyle
-from pygments.token import Name
+from pygments.token import Name, _TokenType
 
 
 class _DemoStyle(GhDarkStyle):
     """GitHub's dark colours, but no purple: cyan for highlighted lines and names."""
 
     highlight_color = "#0f3442"
-    styles = GhDarkStyle.styles | {
+    # Same type as GhDarkStyle.styles: one dict shared by the class, never changed.
+    styles: ClassVar[dict[_TokenType, str]] = {
+        **GhDarkStyle.styles,  # copy GitHub's colours, then replace two of them
         Name.Function: "bold #7dd3fc",  # GitHub uses purple here
         Name.Decorator: "bold #7dd3fc",
     }
